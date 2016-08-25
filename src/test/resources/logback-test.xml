@@ -1,0 +1,30 @@
+<configuration>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>
+                %d{HH:mm:ss.SSS} %highlight(%-5p) %magenta([%-10thread]) %-30logger{0} %cyan(%X{queue} %X{service_id} %X{packlink_ref}) | %m%n
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <root>
+        <level value="warn" />
+        <appender-ref ref="console" />
+    </root>
+
+    <logger name="ch.qos.logback">
+        <level value="warn" />
+    </logger>
+
+    <logger name="es.amplia">
+        <level value="debug" />
+    </logger>
+
+    <logger name="com.datastax">
+        <level value="debug" />
+    </logger>
+
+    <logger name="org.springframework">
+        <level value="info" />
+    </logger>
+</configuration>
