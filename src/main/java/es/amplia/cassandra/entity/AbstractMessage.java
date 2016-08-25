@@ -54,7 +54,7 @@ abstract class AbstractMessage implements Message {
     @Column(name = "msg_size_bytes")
     private int msgSizeBytes;
 
-    @Column(name = "msg_context")
+    @Column(name = "msg_context", codec = MsgContextCodec.class)
     private Map<String, String> msgContext;
 
     @Column(name = "occur_time")
