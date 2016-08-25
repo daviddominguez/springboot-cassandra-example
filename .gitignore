@@ -1,0 +1,31 @@
+# Maven, Ant and Gradle
+bin/
+build/
+target/
+gradle/
+.gradle/
+release.properties
+
+# Eclipse
+.settings/
+.externalToolBuilders/
+.project
+.classpath
+.pdm
+
+# Idea
+out/
+.idea/
+*.iml
+*.ipr
+*.iws
+atlassian-ide-plugin.xml
+
+# Runtime
+logs/
+*.log
+*.swp
+*~
+
+# Mac Finder file
+.DS_store
