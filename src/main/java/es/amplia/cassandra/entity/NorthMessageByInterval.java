@@ -3,19 +3,28 @@ package es.amplia.cassandra.entity;
 import com.datastax.driver.mapping.annotations.Table;
 import es.amplia.model.AuditMessage;
 
-@Table(keyspace = "audit", name="north_messages_by_interval")
+import static es.amplia.cassandra.entity.Message.Names.KEYSPACE;
+import static es.amplia.cassandra.entity.Message.Names.NORTH_MESSAGES_BY_INTERVAL_TABLE;
+
+@Table(keyspace = KEYSPACE, name = NORTH_MESSAGES_BY_INTERVAL_TABLE)
 public class NorthMessageByInterval extends AbstractMessage {
 
     public static class NorthMessageByIntervalBuilder extends AbstractMessageBuilder {
 
+        public static NorthMessageByIntervalBuilder builder() {
+            return new NorthMessageByIntervalBuilder();
+        }
+
+        private NorthMessageByIntervalBuilder() {}
+
         @Override
-        protected AbstractMessage instantiateConcreteMessage() {
-            return new NorthMessageByInterval();
+        protected NorthMessageByInterval getMessage() {
+            return (NorthMessageByInterval) super.getMessage();
         }
 
         @Override
-        public NorthMessageByInterval build(AuditMessage auditMessage) {
-            return (NorthMessageByInterval) super.build(auditMessage);
+        protected AbstractMessage instantiateConcreteMessage() {
+            return new NorthMessageByInterval();
         }
     }
 }

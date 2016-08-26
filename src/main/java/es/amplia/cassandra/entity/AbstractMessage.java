@@ -14,50 +14,53 @@ import java.util.UUID;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Objects.equal;
+import static es.amplia.cassandra.entity.Message.Names.*;
 
 abstract class AbstractMessage implements Message {
 
+    @Column(name = INTERVAL_FIELD)
     private long interval;
 
-    @Column(name = "audit_id")
+    @Column(name = AUDIT_ID_FIELD)
     private UUID auditId;
 
-    @Column
+    @Column(name = COMPONENT_TYPE_FIELD)
     private ComponentType componentType;
 
-    @Column(name = "msg_name")
+    @Column(name = MSG_NAME_FIELD)
     private NameType msgName;
 
-    @Column(name = "msg_type")
+    @Column(name = MSG_TYPE_FIELD)
     private MsgType msgType;
 
-    @Column(name = "msg_direction")
+    @Column(name = MSG_DIRECTION_FIELD)
     private MsgDirection msgDirection;
 
-    @Column
+    @Column(name = SUBJECT_FIELD)
     private String subject;
 
-    @Column(name = "subject_type")
+    @Column(name = SUBJECT_TYPE_FIELD)
     private SubjectType subjectType;
 
+    @Column(name = USER_FIELD)
     private String user;
 
-    @Column(name = "transaction_id")
+    @Column(name = TRANSACTION_ID_FIELD)
     private String transactionId;
 
-    @Column(name = "sequence_id")
+    @Column(name = SEQUENCE_ID_FIELD)
     private String sequenceId;
 
-    @Column(name = "msg_status")
+    @Column(name = MSG_STATUS_FIELD)
     private MsgStatus msgStatus;
 
-    @Column(name = "msg_size_bytes")
+    @Column(name = MSG_SIZE_BYTES_FIELD)
     private int msgSizeBytes;
 
-    @Column(name = "msg_context", codec = MsgContextCodec.class)
+    @Column(name = MSG_CONTEXT_FIELD, codec = MsgContextCodec.class)
     private Map<String, String> msgContext;
 
-    @Column(name = "occur_time")
+    @Column(name = OCCUR_TIME_FIELD)
     private Date occurTime;
 
     @PartitionKey(0)
