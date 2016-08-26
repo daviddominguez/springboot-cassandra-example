@@ -12,7 +12,7 @@ WITH replication = {
 CREATE TABLE IF NOT EXISTS audit.north_messages_by_interval (
 	interval bigint,
 	audit_id timeuuid,
-	component text,
+	component_type text,
 	msg_name text,
 	msg_type text,
 	msg_direction text,
@@ -64,7 +64,7 @@ WITH CLUSTERING ORDER BY (audit_id DESC);
 CREATE TABLE IF NOT EXISTS audit.south_messages_by_interval (
 	interval bigint,
 	audit_id timeuuid,
-	component text,
+	component_type text,
 	msg_name text,
 	msg_type text,
 	msg_direction text,
@@ -103,7 +103,7 @@ WITH CLUSTERING ORDER BY (audit_id DESC);
 CREATE TABLE IF NOT EXISTS audit.alarm_messages_by_interval (
 	interval bigint,
 	audit_id timeuuid,
-	component text,
+	component_type text,
 	msg_name text,
 	msg_type text,
 	msg_direction text,

@@ -16,9 +16,9 @@ public interface Message {
 
     void setAuditId(UUID auditId);
 
-    ComponentType getComponent();
+    ComponentType getComponentType();
 
-    void setComponent(ComponentType component);
+    void setComponentType(ComponentType componentType);
 
     NameType getMsgName();
 
@@ -64,7 +64,7 @@ public interface Message {
 
     void setMsgContext(Map<String, String> msgContext);
 
-    Date getTimestamp();
+    Date getOccurTime();
 
-    void setTimestamp(Date timestamp);
+    void setOccurTime(Date occurTime);
 }

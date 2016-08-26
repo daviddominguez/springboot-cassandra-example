@@ -23,7 +23,7 @@ abstract class AbstractMessage implements Message {
     private UUID auditId;
 
     @Column
-    private ComponentType component;
+    private ComponentType componentType;
 
     @Column(name = "msg_name")
     private NameType msgName;
@@ -58,7 +58,7 @@ abstract class AbstractMessage implements Message {
     private Map<String, String> msgContext;
 
     @Column(name = "occur_time")
-    private Date timestamp;
+    private Date occurTime;
 
     @PartitionKey(0)
     @Override
@@ -82,14 +82,12 @@ abstract class AbstractMessage implements Message {
         this.auditId = auditId;
     }
 
-    @Override
-    public ComponentType getComponent() {
-        return component;
+    public ComponentType getComponentType() {
+        return componentType;
     }
 
-    @Override
-    public void setComponent(ComponentType component) {
-        this.component = component;
+    public void setComponentType(ComponentType componentType) {
+        this.componentType = componentType;
     }
 
     @Override
@@ -202,14 +200,12 @@ abstract class AbstractMessage implements Message {
         this.msgContext = msgContext;
     }
 
-    @Override
-    public Date getTimestamp() {
-        return timestamp;
+    public Date getOccurTime() {
+        return occurTime;
     }
 
-    @Override
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
+    public void setOccurTime(Date occurTime) {
+        this.occurTime = occurTime;
     }
 
     @Override
@@ -220,7 +216,7 @@ abstract class AbstractMessage implements Message {
         return equal(interval, that.interval) &&
                 equal(msgSizeBytes, that.msgSizeBytes) &&
                 equal(auditId, that.auditId) &&
-                equal(component, that.component) &&
+                equal(componentType, that.componentType) &&
                 equal(msgName, that.msgName) &&
                 equal(msgType, that.msgType) &&
                 equal(msgDirection, that.msgDirection) &&
@@ -231,13 +227,13 @@ abstract class AbstractMessage implements Message {
                 equal(sequenceId, that.sequenceId) &&
                 equal(msgStatus, that.msgStatus) &&
                 equal(msgContext, that.msgContext) &&
-                equal(timestamp, that.timestamp);
+                equal(occurTime, that.occurTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(interval, auditId, component, msgName, msgType, msgDirection, subject,
-                subjectType, user, transactionId, sequenceId, msgStatus, msgSizeBytes, msgContext, timestamp);
+        return Objects.hashCode(interval, auditId, componentType, msgName, msgType, msgDirection, subject,
+                subjectType, user, transactionId, sequenceId, msgStatus, msgSizeBytes, msgContext, occurTime);
     }
 
     @Override
@@ -245,7 +241,7 @@ abstract class AbstractMessage implements Message {
         return toStringHelper(this)
                 .add("interval", interval)
                 .add("auditId", auditId)
-                .add("component", component)
+                .add("componentType", componentType)
                 .add("msgName", msgName)
                 .add("msgType", msgType)
                 .add("msgDirection", msgDirection)
@@ -257,7 +253,7 @@ abstract class AbstractMessage implements Message {
                 .add("msgStatus", msgStatus)
                 .add("msgSizeBytes", msgSizeBytes)
                 .add("msgContext", msgContext)
-                .add("timestamp", timestamp)
+                .add("occurTime", occurTime)
                 .omitNullValues()
                 .toString();
     }
@@ -265,8 +261,6 @@ abstract class AbstractMessage implements Message {
     static abstract class AbstractMessageBuilder {
 
         private final AbstractMessage message;
-
-        protected abstract AbstractMessage instantiateConcreteMessage();
 
         protected AbstractMessageBuilder() {
             message = instantiateConcreteMessage();
@@ -276,8 +270,14 @@ abstract class AbstractMessage implements Message {
             return message;
         }
 
-        public AbstractMessage build(AuditMessage auditMessage) {
-            return this.component(auditMessage.getComponent())
+        protected abstract AbstractMessage instantiateConcreteMessage();
+
+        public final AbstractMessage build() {
+            return getMessage();
+        }
+
+        public final AbstractMessage build(AuditMessage auditMessage) {
+            return this.componentType(auditMessage.getComponent())
                     .msgName(auditMessage.getMsgName())
                     .msgType(auditMessage.getMsgType())
                     .msgDirection(auditMessage.getMsgDirection())
@@ -289,12 +289,8 @@ abstract class AbstractMessage implements Message {
                     .msgStatus(auditMessage.getMsgStatus())
                     .msgSizeBytes(auditMessage.getMsgSizeBytes())
                     .msgContext(auditMessage.getMsgContext())
-                    .timestamp(auditMessage.getTimestamp())
+                    .occurTime(auditMessage.getTimestamp())
                     .build();
-        }
-
-        public final AbstractMessage build() {
-            return getMessage();
         }
 
         public AbstractMessageBuilder interval(long interval) {
@@ -307,8 +303,8 @@ abstract class AbstractMessage implements Message {
             return this;
         }
 
-        public AbstractMessageBuilder component(ComponentType component) {
-            message.setComponent(component);
+        public AbstractMessageBuilder componentType(ComponentType component) {
+            message.setComponentType(component);
             return this;
         }
 
@@ -367,8 +363,8 @@ abstract class AbstractMessage implements Message {
             return this;
         }
 
-        public AbstractMessageBuilder timestamp(Date timestamp) {
-            message.setTimestamp(timestamp);
+        public AbstractMessageBuilder occurTime(Date timestamp) {
+            message.setOccurTime(timestamp);
             return this;
         }
     }
