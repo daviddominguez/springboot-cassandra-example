@@ -1,10 +1,10 @@
 package es.amplia.cassandra.bucket;
 
-import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 public interface Bucket {
 
     long getInterval(Date timestamp);
-    Collection<Long> getIntervals(Date start, Date end);
+    List<Long> getIntervals(Date start, Date end);
 }
