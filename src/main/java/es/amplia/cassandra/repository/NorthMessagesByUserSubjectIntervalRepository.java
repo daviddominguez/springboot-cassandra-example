@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public class NorthMessagesByUserSubjectIntervalRepository extends AbstractRepository<NorthMessageByUserSubjectInterval, UUID> {
+public class NorthMessagesByUserSubjectIntervalRepository extends AbstractRepository<NorthMessageByUserSubjectInterval> {
 
     @Autowired
     public NorthMessagesByUserSubjectIntervalRepository(MappingManager mappingManager) {

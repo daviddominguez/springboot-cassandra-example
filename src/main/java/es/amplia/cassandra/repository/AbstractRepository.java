@@ -7,9 +7,7 @@ import com.datastax.driver.mapping.MappingManager;
 import es.amplia.cassandra.bucket.Bucket;
 import es.amplia.cassandra.entity.Message;
 
-import java.io.Serializable;
-
-class AbstractRepository<T extends Message, ID extends Serializable> {
+class AbstractRepository<T extends Message> implements Repository<T> {
 
     private final Mapper<T> mapper;
     private final Bucket bucket;
@@ -19,20 +17,19 @@ class AbstractRepository<T extends Message, ID extends Serializable> {
         this.bucket = bucket;
     }
 
+    @Override
     public Statement saveQuery(T entity) {
         entity.setAuditId(UUIDs.timeBased());
-        entity.setInterval(bucket.getInterval(entity.getTimestamp()));
+        entity.setInterval(bucket.getInterval(entity.getOccurTime()));
         return mapper.saveQuery(entity);
     }
 
-    public T get(ID id) {
+    @Override
+    public T get(Object... id) {
         return mapper.get(id);
     }
 
-    public Statement deleteQuery(T entity) {
-        return mapper.deleteQuery(entity);
-    }
-
+    @Override
     public Bucket getBucket() {
         return bucket;
     }

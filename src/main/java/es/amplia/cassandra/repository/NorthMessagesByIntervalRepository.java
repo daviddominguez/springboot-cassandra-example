@@ -6,10 +6,8 @@ import es.amplia.cassandra.entity.NorthMessageByInterval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.UUID;
-
 @Repository
-public class NorthMessagesByIntervalRepository extends AbstractRepository<NorthMessageByInterval, UUID> {
+public class NorthMessagesByIntervalRepository extends AbstractRepository<NorthMessageByInterval> {
 
     @Autowired
     public NorthMessagesByIntervalRepository(MappingManager mappingManager) {
