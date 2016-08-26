@@ -6,9 +6,14 @@ import com.datastax.driver.mapping.annotations.Param;
 import com.datastax.driver.mapping.annotations.Query;
 import es.amplia.cassandra.entity.NorthMessageByInterval;
 
+import java.util.List;
+
 @Accessor
 public interface NorthMessagesByIntervalAccessor {
 
     @Query("SELECT * FROM audit.north_messages_by_interval WHERE interval=:interval")
     Result<NorthMessageByInterval> getMessagesByInterval(@Param("interval") long interval);
+
+    @Query("SELECT * FROM audit.north_messages_by_interval WHERE interval IN :intervals")
+    Result<NorthMessageByInterval> getMessagesByIntervalList(@Param("intervals")List<Long> intervals);
 }
