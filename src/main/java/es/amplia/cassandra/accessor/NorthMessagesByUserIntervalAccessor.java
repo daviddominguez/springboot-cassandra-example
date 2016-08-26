@@ -17,8 +17,8 @@ public interface NorthMessagesByUserIntervalAccessor {
             @Param("user") String user,
             @Param("interval") long interval);
 
-    @Query("SELECT * FROM audit.north_messages_by_interval WHERE user=:user AND interval IN :intervals")
-    Result<NorthMessageByInterval> getMessagesByUserAndIntervalList(
+    @Query("SELECT * FROM audit.north_messages_by_user_and_interval WHERE user=:user AND interval IN :intervals")
+    Result<NorthMessageByUserInterval> getMessagesByUserAndIntervalList(
             @Param("user") String user,
             @Param("intervals")List<Long> intervals);
 
