@@ -74,7 +74,7 @@ abstract class AbstractMessage implements Message {
         this.interval = interval;
     }
 
-    @ClusteringColumn()
+    @ClusteringColumn(2)
     @Override
     public UUID getAuditId() {
         return auditId;
@@ -203,6 +203,7 @@ abstract class AbstractMessage implements Message {
         this.msgContext = msgContext;
     }
 
+    @ClusteringColumn(1)
     public Date getOccurTime() {
         return occurTime;
     }

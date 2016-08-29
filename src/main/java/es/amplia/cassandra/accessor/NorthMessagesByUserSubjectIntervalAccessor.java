@@ -7,21 +7,26 @@ import com.datastax.driver.mapping.annotations.Query;
 import es.amplia.cassandra.entity.NorthMessageByInterval;
 import es.amplia.cassandra.entity.NorthMessageByUserSubjectInterval;
 
+import java.util.Date;
 import java.util.List;
 
 @Accessor
 public interface NorthMessagesByUserSubjectIntervalAccessor {
 
-    @Query("SELECT * FROM audit.north_messages_by_user_subject_and_interval WHERE user=:user AND subject=:subject AND interval=:interval")
+    @Query("SELECT * FROM audit.north_messages_by_user_subject_and_interval WHERE user=:user AND subject=:subject AND interval=:interval and occur_time >= :fromDate and occur_time <= :toDate")
     Result<NorthMessageByUserSubjectInterval> getMessagesByUserAndSubjectAndInterval(
             @Param("user") String user,
             @Param("subject") String subject,
-            @Param("interval") long interval);
+            @Param("interval") long interval,
+            @Param("fromDate") Date from,
+            @Param("toDate") Date to);
 
-    @Query("SELECT * FROM audit.north_messages_by_user_subject_and_interval WHERE user=:user AND subject=:subject AND interval IN :intervals")
+    @Query("SELECT * FROM audit.north_messages_by_user_subject_and_interval WHERE user=:user AND subject=:subject AND interval IN :intervals and occur_time >= :fromDate and occur_time <= :toDate")
     Result<NorthMessageByUserSubjectInterval> getMessagesByUserAndSubjectAndIntervalList(
             @Param("user") String user,
             @Param("subject") String subject,
-            @Param("intervals")List<Long> intervals);
+            @Param("intervals")List<Long> intervals,
+            @Param("fromDate") Date from,
+            @Param("toDate") Date to);
 
 }

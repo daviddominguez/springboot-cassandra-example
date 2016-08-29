@@ -66,19 +66,19 @@ public class NorthMessagesServiceImpl implements NorthMessagesService {
     @Override
     public List<NorthMessageByInterval> getMessagesByInterval(Date from, Date to) {
         List<Long> interval = getBucketIntervalForRepository(northMessagesByIntervalRepository, from, to, 8);
-        return northMessagesByIntervalAccessor.getMessagesByIntervalList(interval).all();
+        return northMessagesByIntervalAccessor.getMessagesByIntervalList(interval, from, to).all();
     }
 
     @Override
     public List<NorthMessageByUserInterval> getMessagesByUserInterval(String user, Date from, Date to) {
         List<Long> interval = getBucketIntervalForRepository(northMessagesByUserIntervalRepository, from, to, 4);
-        return northMessagesByUserIntervalAccessor.getMessagesByUserAndIntervalList(user, interval).all();
+        return northMessagesByUserIntervalAccessor.getMessagesByUserAndIntervalList(user, interval, from, to).all();
     }
 
     @Override
     public List<NorthMessageByUserSubjectInterval> getMessagesByUserSubjectInterval(String user, String subject, Date from, Date to) {
         List<Long> interval = getBucketIntervalForRepository(northMessagesByUserSubjectIntervalRepository, from, to, 2);
-        return northMessagesByUserSubjectIntervalAccessor.getMessagesByUserAndSubjectAndIntervalList(user, subject, interval).all();
+        return northMessagesByUserSubjectIntervalAccessor.getMessagesByUserAndSubjectAndIntervalList(user, subject, interval, from, to).all();
     }
 
     private List<Long> getBucketIntervalForRepository(Repository repository, Date from, Date to, int maxSize) {
