@@ -12,14 +12,8 @@ import java.util.List;
 @Accessor
 public interface NorthMessagesByIntervalAccessor {
 
-    @Query("SELECT * FROM audit.north_messages_by_interval WHERE interval=:interval and occur_time >= :fromDate and occur_time <= :toDate")
-    Result<NorthMessageByInterval> getMessagesByInterval(
-            @Param("interval") long interval,
-            @Param("fromDate") Date from,
-            @Param("toDate") Date to);
-
     @Query("SELECT * FROM audit.north_messages_by_interval WHERE interval IN :intervals and occur_time >= :fromDate and occur_time <= :toDate")
-    Result<NorthMessageByInterval> getMessagesByIntervalList(
+    Result<NorthMessageByInterval> getMessagesByInterval(
             @Param("intervals")List<Long> intervals,
             @Param("fromDate") Date from,
             @Param("toDate") Date to);

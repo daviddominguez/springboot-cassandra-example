@@ -13,15 +13,8 @@ import java.util.List;
 @Accessor
 public interface NorthMessagesByUserIntervalAccessor {
 
-    @Query("SELECT * FROM audit.north_messages_by_user_and_interval WHERE user=:user AND interval=:interval and occur_time >= :fromDate and occur_time <= :toDate")
-    Result<NorthMessageByUserInterval> getMessagesByUserAndInterval(
-            @Param("user") String user,
-            @Param("interval") long interval,
-            @Param("fromDate") Date from,
-            @Param("toDate") Date to);
-
     @Query("SELECT * FROM audit.north_messages_by_user_and_interval WHERE user=:user AND interval IN :intervals and occur_time >= :fromDate and occur_time <= :toDate")
-    Result<NorthMessageByUserInterval> getMessagesByUserAndIntervalList(
+    Result<NorthMessageByUserInterval> getMessagesByUserAndInterval(
             @Param("user") String user,
             @Param("intervals")List<Long> intervals,
             @Param("fromDate") Date from,
