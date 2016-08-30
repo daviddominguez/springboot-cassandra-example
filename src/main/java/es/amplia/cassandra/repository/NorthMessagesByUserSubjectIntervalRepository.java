@@ -5,7 +5,6 @@ import com.datastax.driver.mapping.Result;
 import es.amplia.cassandra.accessor.NorthMessagesByUserSubjectIntervalAccessor;
 import es.amplia.cassandra.bucket.Bucket;
 import es.amplia.cassandra.bucket.BucketType;
-import es.amplia.cassandra.bucket.SemesterBucket;
 import es.amplia.cassandra.entity.NorthMessageByUserSubjectInterval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -13,14 +12,16 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 import java.util.List;
 
+import static es.amplia.cassandra.bucket.Bucket.Type.SEMESTER;
+
 @Repository
 public class NorthMessagesByUserSubjectIntervalRepository extends AbstractRepository<NorthMessageByUserSubjectInterval> {
 
     private NorthMessagesByUserSubjectIntervalAccessor accessor;
 
     @Autowired
-    public NorthMessagesByUserSubjectIntervalRepository(MappingManager mappingManager) {
-        super(mappingManager, NorthMessageByUserSubjectInterval.class, new SemesterBucket());
+    public NorthMessagesByUserSubjectIntervalRepository(MappingManager mappingManager, @BucketType(SEMESTER) Bucket bucket) {
+        super(mappingManager, NorthMessageByUserSubjectInterval.class, bucket);
         accessor = mappingManager.createAccessor(NorthMessagesByUserSubjectIntervalAccessor.class);
     }
 

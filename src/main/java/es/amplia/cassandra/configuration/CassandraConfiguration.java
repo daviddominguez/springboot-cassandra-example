@@ -3,18 +3,22 @@ package es.amplia.cassandra.configuration;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.mapping.MappingManager;
-import es.amplia.cassandra.accessor.NorthMessagesByIntervalAccessor;
-import es.amplia.cassandra.accessor.NorthMessagesByUserIntervalAccessor;
-import es.amplia.cassandra.accessor.NorthMessagesByUserSubjectIntervalAccessor;
+import es.amplia.cassandra.bucket.*;
+import es.amplia.cassandra.repository.Repository;
+import es.amplia.cassandra.service.NorthMessagesService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScans;
 import org.springframework.context.annotation.Configuration;
 
+import static es.amplia.cassandra.bucket.Bucket.Type.MONTH;
+import static es.amplia.cassandra.bucket.Bucket.Type.SEMESTER;
+import static es.amplia.cassandra.bucket.Bucket.Type.WEEK;
+
 @Configuration
 @ComponentScans({
-    @ComponentScan("es.amplia.cassandra.repository"),
-        @ComponentScan("es.amplia.cassandra.service")
+    @ComponentScan(basePackageClasses = {Repository.class}),
+        @ComponentScan(basePackageClasses = {NorthMessagesService.class})
 })
 public class CassandraConfiguration {
 
@@ -29,17 +33,20 @@ public class CassandraConfiguration {
     }
 
     @Bean
-    public NorthMessagesByIntervalAccessor northMessagesByIntervalAccessor(MappingManager mappingManager) {
-        return mappingManager.createAccessor(NorthMessagesByIntervalAccessor.class);
+    @BucketType(WEEK)
+    public Bucket weekBucket() {
+        return new WeekBucket();
     }
 
     @Bean
-    public NorthMessagesByUserIntervalAccessor northMessagesByUserIntervalAccessor(MappingManager mappingManager) {
-        return mappingManager.createAccessor(NorthMessagesByUserIntervalAccessor.class);
+    @BucketType(MONTH)
+    public Bucket monthBucket() {
+        return new MonthBucket();
     }
 
     @Bean
-    public NorthMessagesByUserSubjectIntervalAccessor northMessagesByUserSubjectIntervalAccessor(MappingManager mappingManager) {
-        return mappingManager.createAccessor(NorthMessagesByUserSubjectIntervalAccessor.class);
+    @BucketType(SEMESTER)
+    public Bucket semesterBucket() {
+        return new SemesterBucket();
     }
 }
