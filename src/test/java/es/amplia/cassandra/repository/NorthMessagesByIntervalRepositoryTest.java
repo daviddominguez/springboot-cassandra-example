@@ -61,6 +61,7 @@ public class NorthMessagesByIntervalRepositoryTest {
 
         NorthMessageByInterval queriedMessage = repository.get(
                 persistedMessage.getInterval(),
+                persistedMessage.getOccurTime(),
                 persistedMessage.getAuditId());
 
         verify_both_messages_are_equal(queriedMessage, persistedMessage);

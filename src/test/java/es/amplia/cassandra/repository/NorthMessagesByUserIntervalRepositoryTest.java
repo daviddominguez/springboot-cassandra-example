@@ -59,9 +59,10 @@ public class NorthMessagesByUserIntervalRepositoryTest {
                 (NorthMessageByUserInterval) given_a_persisted_message(given_a_message_by_user_interval(), session, repository);
 
         NorthMessageByUserInterval queriedMessage = repository.get(
-                        persistedMessage.getInterval(),
-                        persistedMessage.getUser(),
-                        persistedMessage.getAuditId());
+                persistedMessage.getInterval(),
+                persistedMessage.getUser(),
+                persistedMessage.getOccurTime(),
+                persistedMessage.getAuditId());
 
         verify_both_messages_are_equal(queriedMessage, persistedMessage);
     }

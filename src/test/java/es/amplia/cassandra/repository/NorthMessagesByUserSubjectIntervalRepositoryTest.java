@@ -62,6 +62,7 @@ public class NorthMessagesByUserSubjectIntervalRepositoryTest {
                 persistedMessage.getInterval(),
                 persistedMessage.getUser(),
                 persistedMessage.getSubject(),
+                persistedMessage.getOccurTime(),
                 persistedMessage.getAuditId());
 
         verify_both_messages_are_equal(queriedMessage, persistedMessage);
