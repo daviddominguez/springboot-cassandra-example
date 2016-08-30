@@ -18,52 +18,38 @@ import static es.amplia.cassandra.entity.Message.Names.*;
 
 abstract class AbstractMessage implements Message {
 
-    @Column(name = INTERVAL_FIELD)
     private long interval;
 
-    @Column(name = AUDIT_ID_FIELD)
     private UUID auditId;
 
-    @Column(name = COMPONENT_TYPE_FIELD)
     private ComponentType componentType;
 
-    @Column(name = MSG_NAME_FIELD)
     private NameType msgName;
 
-    @Column(name = MSG_TYPE_FIELD)
     private MsgType msgType;
 
-    @Column(name = MSG_DIRECTION_FIELD)
     private MsgDirection msgDirection;
 
-    @Column(name = SUBJECT_FIELD)
     private String subject;
 
-    @Column(name = SUBJECT_TYPE_FIELD)
     private SubjectType subjectType;
 
-    @Column(name = USER_FIELD)
     private String user;
 
-    @Column(name = TRANSACTION_ID_FIELD)
     private String transactionId;
 
-    @Column(name = SEQUENCE_ID_FIELD)
     private String sequenceId;
 
-    @Column(name = MSG_STATUS_FIELD)
     private MsgStatus msgStatus;
 
-    @Column(name = MSG_SIZE_BYTES_FIELD)
     private int msgSizeBytes;
 
-    @Column(name = MSG_CONTEXT_FIELD, codec = MsgContextCodec.class)
     private Map<String, String> msgContext;
 
-    @Column(name = OCCUR_TIME_FIELD)
     private Date occurTime;
 
     @PartitionKey(0)
+    @Column(name = INTERVAL_FIELD)
     @Override
     public long getInterval() {
         return interval;
@@ -74,7 +60,8 @@ abstract class AbstractMessage implements Message {
         this.interval = interval;
     }
 
-    @ClusteringColumn(2)
+    @ClusteringColumn(1)
+    @Column(name = AUDIT_ID_FIELD)
     @Override
     public UUID getAuditId() {
         return auditId;
@@ -85,14 +72,18 @@ abstract class AbstractMessage implements Message {
         this.auditId = auditId;
     }
 
+    @Column(name = COMPONENT_TYPE_FIELD)
+    @Override
     public ComponentType getComponentType() {
         return componentType;
     }
 
+    @Override
     public void setComponentType(ComponentType componentType) {
         this.componentType = componentType;
     }
 
+    @Column(name = MSG_NAME_FIELD)
     @Override
     public NameType getMsgName() {
         return msgName;
@@ -103,6 +94,7 @@ abstract class AbstractMessage implements Message {
         this.msgName = msgName;
     }
 
+    @Column(name = MSG_TYPE_FIELD)
     @Override
     public MsgType getMsgType() {
         return msgType;
@@ -113,6 +105,7 @@ abstract class AbstractMessage implements Message {
         this.msgType = msgType;
     }
 
+    @Column(name = MSG_DIRECTION_FIELD)
     @Override
     public MsgDirection getMsgDirection() {
         return msgDirection;
@@ -123,6 +116,7 @@ abstract class AbstractMessage implements Message {
         this.msgDirection = msgDirection;
     }
 
+    @Column(name = SUBJECT_FIELD)
     @Override
     public String getSubject() {
         return subject;
@@ -133,6 +127,7 @@ abstract class AbstractMessage implements Message {
         this.subject = subject;
     }
 
+    @Column(name = SUBJECT_TYPE_FIELD)
     @Override
     public SubjectType getSubjectType() {
         return subjectType;
@@ -143,6 +138,7 @@ abstract class AbstractMessage implements Message {
         this.subjectType = subjectType;
     }
 
+    @Column(name = USER_FIELD)
     @Override
     public String getUser() {
         return user;
@@ -153,6 +149,7 @@ abstract class AbstractMessage implements Message {
         this.user = user;
     }
 
+    @Column(name = TRANSACTION_ID_FIELD)
     @Override
     public String getTransactionId() {
         return transactionId;
@@ -163,6 +160,7 @@ abstract class AbstractMessage implements Message {
         this.transactionId = transactionId;
     }
 
+    @Column(name = SEQUENCE_ID_FIELD)
     @Override
     public String getSequenceId() {
         return sequenceId;
@@ -173,6 +171,7 @@ abstract class AbstractMessage implements Message {
         this.sequenceId = sequenceId;
     }
 
+    @Column(name = MSG_STATUS_FIELD)
     @Override
     public MsgStatus getMsgStatus() {
         return msgStatus;
@@ -183,6 +182,7 @@ abstract class AbstractMessage implements Message {
         this.msgStatus = msgStatus;
     }
 
+    @Column(name = MSG_SIZE_BYTES_FIELD)
     @Override
     public int getMsgSizeBytes() {
         return msgSizeBytes;
@@ -193,6 +193,7 @@ abstract class AbstractMessage implements Message {
         this.msgSizeBytes = msgSizeBytes;
     }
 
+    @Column(name = MSG_CONTEXT_FIELD, codec = MsgContextCodec.class)
     @Override
     public Map<String, String> getMsgContext() {
         return msgContext;
@@ -203,11 +204,14 @@ abstract class AbstractMessage implements Message {
         this.msgContext = msgContext;
     }
 
-    @ClusteringColumn(1)
+    @Column(name = OCCUR_TIME_FIELD)
+    @ClusteringColumn()
+    @Override
     public Date getOccurTime() {
         return occurTime;
     }
 
+    @Override
     public void setOccurTime(Date occurTime) {
         this.occurTime = occurTime;
     }
