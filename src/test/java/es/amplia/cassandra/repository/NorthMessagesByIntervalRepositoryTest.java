@@ -4,12 +4,8 @@ import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.Statement;
 import es.amplia.cassandra.TestSpringBootCassandraApplication;
-import es.amplia.cassandra.bucket.Bucket;
-import es.amplia.cassandra.bucket.WeekBucket;
 import es.amplia.cassandra.entity.NorthMessageByInterval;
 import es.amplia.model.builder.AuditMessageBuilder;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +25,6 @@ import static es.amplia.model.AuditMessage.NameType.DMM;
 import static es.amplia.model.AuditMessage.ProcessType.REST_NORTH;
 import static es.amplia.model.AuditMessage.SubjectType.IMSI;
 import static java.util.Collections.singletonMap;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestSpringBootCassandraApplication.class)
@@ -41,11 +35,6 @@ public class NorthMessagesByIntervalRepositoryTest {
 
     @Autowired
     private Session session;
-
-    @Test
-    public void given_a_north_message_by_interval_when_created_then_verify_uses_week_bucket_implementation() {
-        assertThat(repository.getBucket(), instanceOf(WeekBucket.class));
-    }
 
     @Test
     public void given_a_north_message_by_interval_when_saved_into_repository_then_verify_is_correctly_saved() throws ParseException {

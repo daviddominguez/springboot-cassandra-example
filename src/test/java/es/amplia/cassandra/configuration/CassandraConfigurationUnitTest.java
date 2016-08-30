@@ -35,15 +35,6 @@ public class CassandraConfigurationUnitTest {
     private MappingManager mappingManager;
 
     @Autowired
-    private NorthMessagesByIntervalAccessor northMessagesByIntervalAccessor;
-
-    @Autowired
-    private NorthMessagesByUserIntervalAccessor northMessagesByUserIntervalAccessor;
-
-    @Autowired
-    private NorthMessagesByUserSubjectIntervalAccessor northMessagesByUserSubjectIntervalAccessor;
-
-    @Autowired
     private NorthMessagesByIntervalRepository northMessagesByIntervalRepository;
 
     @Autowired
@@ -64,9 +55,6 @@ public class CassandraConfigurationUnitTest {
         assertThat(cluster.getMetadata().getKeyspace("audit"), notNullValue());
         assertThat(session.getCluster(), is(cluster));
         assertThat(mappingManager.getSession(), is(session));
-        assertThat(northMessagesByIntervalAccessor, notNullValue());
-        assertThat(northMessagesByUserIntervalAccessor, notNullValue());
-        assertThat(northMessagesByUserSubjectIntervalAccessor, notNullValue());
         assertThat(northMessagesByIntervalRepository, notNullValue());
         assertThat(northMessagesByUserIntervalRepository, notNullValue());
         assertThat(northMessagesByUserSubjectIntervalRepository, notNullValue());

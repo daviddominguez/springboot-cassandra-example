@@ -7,6 +7,11 @@ import com.datastax.driver.mapping.MappingManager;
 import es.amplia.cassandra.bucket.Bucket;
 import es.amplia.cassandra.entity.Message;
 
+import java.util.Date;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkArgument;
+
 class AbstractRepository<T extends Message> implements Repository<T> {
 
     private final Mapper<T> mapper;
@@ -29,8 +34,9 @@ class AbstractRepository<T extends Message> implements Repository<T> {
         return mapper.get(id);
     }
 
-    @Override
-    public Bucket getBucket() {
-        return bucket;
+    List<Long> getInterval(Date from, Date to, int maxSize) {
+        List<Long> intervals = bucket.getIntervals(from, to);
+        checkArgument(intervals.size() < maxSize, "specified time range is too big, be more specific");
+        return intervals;
     }
 }
