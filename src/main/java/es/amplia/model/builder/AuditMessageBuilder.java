@@ -4,6 +4,7 @@ import es.amplia.model.AuditMessage;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -60,8 +61,13 @@ public class AuditMessageBuilder {
         return this;
     }
 
-    public AuditMessageBuilder transactionId(String transactionId) {
-        auditMessage.setTransactionId(transactionId);
+    public AuditMessageBuilder localCorrelationId(String localCorrelationId) {
+        auditMessage.setLocalCorrelationId(localCorrelationId);
+        return this;
+    }
+
+    public AuditMessageBuilder globalCorrelationId(String globalCorrelationId) {
+        auditMessage.setGlobalCorrelationId(globalCorrelationId);
         return this;
     }
 
@@ -72,6 +78,11 @@ public class AuditMessageBuilder {
 
     public AuditMessageBuilder msgStatus(AuditMessage.MsgStatus msgStatus) {
         auditMessage.setMsgStatus(msgStatus);
+        return this;
+    }
+
+    public AuditMessageBuilder secured(Boolean secured) {
+        auditMessage.setSecured(secured);
         return this;
     }
 
@@ -86,8 +97,14 @@ public class AuditMessageBuilder {
         return this;
     }
 
-    public AuditMessageBuilder timestamp(Date createdDate) {
-        auditMessage.setTimestamp(createdDate);
+    public AuditMessageBuilder msgPayload(List<String> msgPayload) {
+        checkNotNull(msgPayload);
+        auditMessage.setMsgPayload(msgPayload);
+        return this;
+    }
+
+    public AuditMessageBuilder timestamp(Date timestamp) {
+        auditMessage.setTimestamp(timestamp);
         return this;
     }
 

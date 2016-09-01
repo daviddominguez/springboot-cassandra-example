@@ -9,6 +9,7 @@ import es.amplia.model.AuditMessage;
 import es.amplia.model.AuditMessage.*;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,11 +37,15 @@ abstract class AbstractMessage implements Message {
 
     private String user;
 
-    private String transactionId;
+    private String localCorrelationId;
+
+    private String globalCorrelationId;
 
     private String sequenceId;
 
     private MsgStatus msgStatus;
+
+    private Boolean secured;
 
     private int msgSizeBytes;
 
@@ -149,15 +154,26 @@ abstract class AbstractMessage implements Message {
         this.user = user;
     }
 
-    @Column(name = TRANSACTION_ID_FIELD)
+    @Column(name = LOCAL_CORRELATION_ID_FIELD)
     @Override
-    public String getTransactionId() {
-        return transactionId;
+    public String getLocalCorrelationId() {
+        return localCorrelationId;
     }
 
     @Override
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
+    public void setLocalCorrelationId(String localCorrelationId) {
+        this.localCorrelationId = localCorrelationId;
+    }
+
+    @Column(name = GLOBAL_CORRELATION_ID_FIELD)
+    @Override
+    public String getGlobalCorrelationId() {
+        return globalCorrelationId;
+    }
+
+    @Override
+    public void setGlobalCorrelationId(String globalCorrelationId) {
+        this.globalCorrelationId = globalCorrelationId;
     }
 
     @Column(name = SEQUENCE_ID_FIELD)
@@ -180,6 +196,17 @@ abstract class AbstractMessage implements Message {
     @Override
     public void setMsgStatus(MsgStatus msgStatus) {
         this.msgStatus = msgStatus;
+    }
+
+    @Column(name = SECURED_FIELD)
+    @Override
+    public Boolean getSecured() {
+        return secured;
+    }
+
+    @Override
+    public void setSecured(Boolean secured) {
+        this.secured = secured;
     }
 
     @Column(name = MSG_SIZE_BYTES_FIELD)
@@ -231,9 +258,11 @@ abstract class AbstractMessage implements Message {
                 equal(subject, that.subject) &&
                 equal(subjectType, that.subjectType) &&
                 equal(user, that.user) &&
-                equal(transactionId, that.transactionId) &&
+                equal(localCorrelationId, that.localCorrelationId) &&
+                equal(globalCorrelationId, that.globalCorrelationId) &&
                 equal(sequenceId, that.sequenceId) &&
                 equal(msgStatus, that.msgStatus) &&
+                equal(secured, that.secured) &&
                 equal(msgContext, that.msgContext) &&
                 equal(occurTime, that.occurTime);
     }
@@ -241,7 +270,8 @@ abstract class AbstractMessage implements Message {
     @Override
     public int hashCode() {
         return Objects.hashCode(interval, auditId, componentType, msgName, msgType, msgDirection, subject,
-                subjectType, user, transactionId, sequenceId, msgStatus, msgSizeBytes, msgContext, occurTime);
+                subjectType, user, localCorrelationId, globalCorrelationId, sequenceId, msgStatus, secured,
+                msgSizeBytes, msgContext, occurTime);
     }
 
     @Override
@@ -256,9 +286,11 @@ abstract class AbstractMessage implements Message {
                 .add("subject", subject)
                 .add("subjectType", subjectType)
                 .add("user", user)
-                .add("transactionId", transactionId)
+                .add("localCorrelationId", localCorrelationId)
+                .add("globalCorrelationId", globalCorrelationId)
                 .add("sequenceId", sequenceId)
                 .add("msgStatus", msgStatus)
+                .add("secured", secured)
                 .add("msgSizeBytes", msgSizeBytes)
                 .add("msgContext", msgContext)
                 .add("occurTime", occurTime)
@@ -292,9 +324,11 @@ abstract class AbstractMessage implements Message {
                     .subject(auditMessage.getSubject())
                     .subjectType(auditMessage.getSubjectType())
                     .user(auditMessage.getUser())
-                    .transactionId(auditMessage.getTransactionId())
+                    .localCorrelationId(auditMessage.getLocalCorrelationId())
+                    .globalCorrelationId(auditMessage.getGlobalCorrelationId())
                     .sequenceId(auditMessage.getSequenceId())
                     .msgStatus(auditMessage.getMsgStatus())
+                    .secured(auditMessage.getSecured())
                     .msgSizeBytes(auditMessage.getMsgSizeBytes())
                     .msgContext(auditMessage.getMsgContext())
                     .occurTime(auditMessage.getTimestamp())
@@ -346,8 +380,13 @@ abstract class AbstractMessage implements Message {
             return this;
         }
 
-        public AbstractMessageBuilder transactionId(String transactionId) {
-            message.setTransactionId(transactionId);
+        public AbstractMessageBuilder localCorrelationId(String localCorrelationId) {
+            message.setLocalCorrelationId(localCorrelationId);
+            return this;
+        }
+
+        public AbstractMessageBuilder globalCorrelationId(String globalCorrelationId) {
+            message.setGlobalCorrelationId(globalCorrelationId);
             return this;
         }
 
@@ -358,6 +397,11 @@ abstract class AbstractMessage implements Message {
 
         public AbstractMessageBuilder msgStatus(MsgStatus msgStatus) {
             message.setMsgStatus(msgStatus);
+            return this;
+        }
+
+        public AbstractMessageBuilder secured(Boolean secured) {
+            message.setSecured(secured);
             return this;
         }
 

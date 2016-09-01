@@ -3,6 +3,7 @@ package es.amplia.model;
 import com.google.common.base.Objects;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
@@ -12,7 +13,8 @@ public class AuditMessage {
 
     public enum ProcessType {CONNECTOR, REST_NORTH, ALARM}
     public enum ComponentType {RACO, PING_RELAY, REST, WEBSOCKET, MQTT, WS_JOB, WS_PROVISION, SNMP}
-    public enum NameType {ACCT_START, PING_REQUEST, PING_REPLY, DMM, OPERATION, ACCESS_VALIDATION, REFRESH_PRESENCE, CHANGE_PRESENCE, DEVICES}
+    public enum NameType {ACCT_START, PING_REQUEST, PING_REPLY, DMM, OPERATION, ACCESS_VALIDATION, REFRESH_PRESENCE,
+        CHANGE_PRESENCE, DEVICES}
     public enum MsgType {EVENT, REQUEST, RESPONSE, CONNECTION, INSERT, UPDATE, DELETE, CALLBACK, NOTIFICATION}
     public enum MsgDirection {IN, OUT}
     public enum SubjectType {IMSI, DEVICE, JOB, IP}
@@ -26,11 +28,14 @@ public class AuditMessage {
     private String subject;
     private SubjectType subjectType;
     private String user;
-    private String transactionId;
+    private String localCorrelationId;
+    private String globalCorrelationId;
     private String sequenceId;
     private MsgStatus msgStatus;
+    private Boolean secured;
     private int msgSizeBytes;
     private Map<String, String> msgContext;
+    private List<String> msgPayload;
     private Date timestamp;
     private int version;
 
@@ -98,12 +103,20 @@ public class AuditMessage {
         this.user = user;
     }
 
-    public String getTransactionId() {
-        return transactionId;
+    public String getLocalCorrelationId() {
+        return localCorrelationId;
     }
 
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
+    public void setLocalCorrelationId(String localCorrelationId) {
+        this.localCorrelationId = localCorrelationId;
+    }
+
+    public String getGlobalCorrelationId() {
+        return globalCorrelationId;
+    }
+
+    public void setGlobalCorrelationId(String globalCorrelationId) {
+        this.globalCorrelationId = globalCorrelationId;
     }
 
     public String getSequenceId() {
@@ -122,6 +135,14 @@ public class AuditMessage {
         this.msgStatus = msgStatus;
     }
 
+    public Boolean getSecured() {
+        return secured;
+    }
+
+    public void setSecured(Boolean secured) {
+        this.secured = secured;
+    }
+
     public int getMsgSizeBytes() {
         return msgSizeBytes;
     }
@@ -136,6 +157,14 @@ public class AuditMessage {
 
     public void setMsgContext(Map<String, String> msgContext) {
         this.msgContext = msgContext;
+    }
+
+    public List<String> getMsgPayload() {
+        return msgPayload;
+    }
+
+    public void setMsgPayload(List<String> msgPayload) {
+        this.msgPayload = msgPayload;
     }
 
     public Date getTimestamp() {
@@ -169,17 +198,21 @@ public class AuditMessage {
                 equal(subject, that.subject) &&
                 equal(subjectType, that.subjectType) &&
                 equal(user, that.user) &&
-                equal(transactionId, that.transactionId) &&
+                equal(localCorrelationId, that.localCorrelationId) &&
+                equal(globalCorrelationId, that.globalCorrelationId) &&
                 equal(sequenceId, that.sequenceId) &&
                 equal(msgStatus, that.msgStatus) &&
+                equal(secured, that.secured) &&
                 equal(msgContext, that.msgContext) &&
+                equal(msgPayload, that.msgPayload) &&
                 equal(timestamp, that.timestamp);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(process, component, msgName, msgType, msgDirection, subject, subjectType, user, transactionId,
-                sequenceId, msgStatus, msgSizeBytes, msgContext, timestamp, version);
+        return Objects.hashCode(process, component, msgName, msgType, msgDirection, subject, subjectType, user,
+                localCorrelationId, globalCorrelationId, sequenceId, msgStatus, secured, msgSizeBytes, msgContext,
+                msgPayload, timestamp, version);
     }
 
     @Override
@@ -193,11 +226,14 @@ public class AuditMessage {
                 .add("subject", subject)
                 .add("subjectType", subjectType)
                 .add("user", user)
-                .add("transactionId", transactionId)
+                .add("localCorrelationId", localCorrelationId)
+                .add("globalCorrelationId", globalCorrelationId)
                 .add("sequenceId", sequenceId)
                 .add("msgStatus", msgStatus)
+                .add("secured", secured)
                 .add("msgSizeBytes", msgSizeBytes)
                 .add("msgContext", msgContext)
+                .add("msgPayload", msgPayload)
                 .add("timestamp", timestamp)
                 .add("version", version)
                 .omitNullValues()

@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 
 import static es.amplia.cassandra.entity.NorthMessageByInterval.NorthMessageByIntervalBuilder.builder;
 import static es.amplia.cassandra.repository.RepositoryTestUtils.*;
@@ -24,6 +25,9 @@ import static es.amplia.model.AuditMessage.MsgType.RESPONSE;
 import static es.amplia.model.AuditMessage.NameType.DMM;
 import static es.amplia.model.AuditMessage.ProcessType.REST_NORTH;
 import static es.amplia.model.AuditMessage.SubjectType.IMSI;
+import static java.lang.Boolean.TRUE;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 
 @RunWith(SpringRunner.class)
@@ -73,11 +77,14 @@ public class NorthMessagesByIntervalRepositoryTest {
                         .subject("subject")
                         .subjectType(IMSI)
                         .user("user")
-                        .transactionId("transactionId")
+                        .localCorrelationId("localCorrelationId")
+                        .globalCorrelationId("globalCorrelationId")
                         .sequenceId("sequenceId")
                         .msgStatus(SUCCESS)
+                        .secured(TRUE)
                         .msgSizeBytes(100)
-                        .msgContext(singletonMap("payload_key", "payload_value"))
+                        .msgContext(singletonMap("context_key", "context_value"))
+                        .msgPayload(asList("payload_value_1", "payload_value_2"))
                         .timestamp(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse("2016-01-01T0:00:00.000"))
                         .version(1)
                         .build());

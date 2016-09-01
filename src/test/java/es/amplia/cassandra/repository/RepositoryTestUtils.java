@@ -29,7 +29,8 @@ class RepositoryTestUtils {
 
     static void verify_message_parameters_are_correct(Message message, BoundStatement statement, String expectedQuery) {
         assertThat(statement.preparedStatement().getQueryString(), startsWith(expectedQuery));
-        assertThat(statement.getString(TRANSACTION_ID_FIELD), equalTo(message.getTransactionId()));
+        assertThat(statement.getString(LOCAL_CORRELATION_ID_FIELD), equalTo(message.getLocalCorrelationId()));
+        assertThat(statement.getString(GLOBAL_CORRELATION_ID_FIELD), equalTo(message.getGlobalCorrelationId()));
         assertThat(statement.getString(SUBJECT_FIELD), equalTo(message.getSubject()));
         assertThat(statement.getLong(INTERVAL_FIELD), equalTo(message.getInterval()));
         assertThat(statement.getString(COMPONENT_TYPE_FIELD), equalTo(message.getComponentType().name()));
@@ -44,13 +45,15 @@ class RepositoryTestUtils {
         assertThat(statement.getString(MSG_TYPE_FIELD), equalTo(message.getMsgType().name()));
         assertThat(statement.getString(SEQUENCE_ID_FIELD), equalTo(message.getSequenceId()));
         assertThat(statement.getString(MSG_STATUS_FIELD), equalTo(message.getMsgStatus().name()));
+        assertThat(statement.getBool(SECURED_FIELD), equalTo(message.getSecured()));
     }
 
     static void verify_both_messages_are_equal(Message persisted, Message queried) {
         assertThat(persisted.getInterval(), equalTo(queried.getInterval()));
         assertThat(persisted.getAuditId(), notNullValue());
         assertThat(persisted.getComponentType(), equalTo(queried.getComponentType()));
-        assertThat(persisted.getTransactionId(), equalTo(queried.getTransactionId()));
+        assertThat(persisted.getLocalCorrelationId(), equalTo(queried.getLocalCorrelationId()));
+        assertThat(persisted.getGlobalCorrelationId(), equalTo(queried.getGlobalCorrelationId()));
         assertThat(persisted.getSubject(), equalTo(queried.getSubject()));
         assertThat(persisted.getMsgName(), equalTo(queried.getMsgName()));
         assertThat(persisted.getMsgSizeBytes(), equalTo(queried.getMsgSizeBytes()));
@@ -62,5 +65,6 @@ class RepositoryTestUtils {
         assertThat(persisted.getMsgType(), equalTo(queried.getMsgType()));
         assertThat(persisted.getSequenceId(), equalTo(queried.getSequenceId()));
         assertThat(persisted.getMsgStatus(), equalTo(queried.getMsgStatus()));
+        assertThat(persisted.getSecured(), equalTo(queried.getSecured()));
     }
 }

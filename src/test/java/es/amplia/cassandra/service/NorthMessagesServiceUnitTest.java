@@ -200,8 +200,12 @@ public class NorthMessagesServiceUnitTest {
         return asList("subject_1", "subject_2", "subject_3", "subject_4", "subject_5");
     }
 
-    private List<String> given_a_list_of_transaction_ids() {
-        return asList("transactionId_1", "transactionId_2", "transactionId_3");
+    private List<String> given_a_list_of_local_correlation_ids() {
+        return asList("local_correlationId_1", "local_correlationId_2", "local_correlationId_3");
+    }
+
+    private List<String> given_a_list_of_global_correlation_ids() {
+        return asList("global_correlationId_1", "global_correlationId_2", "global_correlationId_3");
     }
 
     private List<String> given_a_list_of_sequence_ids() {
@@ -211,7 +215,8 @@ public class NorthMessagesServiceUnitTest {
     private AuditMessage given_an_auditMessage(Date date) {
         List<String> users = given_a_list_of_users();
         List<String> subjects = given_a_list_of_subjects();
-        List<String> transactionIds = given_a_list_of_transaction_ids();
+        List<String> localCorrelationIds = given_a_list_of_local_correlation_ids();
+        List<String> globalCorrelationIds = given_a_list_of_global_correlation_ids();
         List<String> sequenceIds = given_a_list_of_sequence_ids();
 
         return AuditMessageBuilder.builder()
@@ -223,11 +228,14 @@ public class NorthMessagesServiceUnitTest {
                 .subject(subjects.get(new Random().nextInt(subjects.size())))
                 .subjectType(asList(SubjectType.values()).get(new Random().nextInt(SubjectType.values().length)))
                 .user(users.get(new Random().nextInt(users.size())))
-                .transactionId(transactionIds.get(new Random().nextInt(transactionIds.size())))
+                .localCorrelationId(localCorrelationIds.get(new Random().nextInt(localCorrelationIds.size())))
+                .globalCorrelationId(globalCorrelationIds.get(new Random().nextInt(globalCorrelationIds.size())))
                 .sequenceId(sequenceIds.get(new Random().nextInt(sequenceIds.size())))
                 .msgStatus(asList(MsgStatus.values()).get(new Random().nextInt(MsgStatus.values().length)))
+                .secured(new Random().nextBoolean())
                 .msgSizeBytes(100)
-                .msgContext(singletonMap("payload_key", "payload_value"))
+                .msgContext(singletonMap("context_key", "context_value"))
+                .msgPayload(asList("payload_value_1", "payload_value_2"))
                 .timestamp(date)
                 .version(1)
                 .build();
@@ -243,12 +251,14 @@ public class NorthMessagesServiceUnitTest {
         assertThat(message.getSubject(), anyOf(isIn(given_a_list_of_subjects()), equalTo("subjectA")));
         assertThat(message.getSubjectType(), isIn(SubjectType.values()));
         assertThat(message.getUser(), anyOf(isIn(given_a_list_of_users()), equalTo("userA")));
-        assertThat(message.getTransactionId(), isIn(given_a_list_of_transaction_ids()));
+        assertThat(message.getLocalCorrelationId(), isIn(given_a_list_of_local_correlation_ids()));
+        assertThat(message.getGlobalCorrelationId(), isIn(given_a_list_of_global_correlation_ids()));
         assertThat(message.getSequenceId(), isIn(given_a_list_of_sequence_ids()));
         assertThat(message.getMsgStatus(), isIn(MsgStatus.values()));
+        assertThat(message.getSecured(), notNullValue());
         assertThat(message.getMsgSizeBytes(), is(100));
-        assertThat(message.getMsgContext(), hasKey("payload_key"));
-        assertThat(message.getMsgContext(), hasValue("payload_value"));
+        assertThat(message.getMsgContext(), hasKey("context_key"));
+        assertThat(message.getMsgContext(), hasValue("context_value"));
         assertThat(message.getOccurTime(), notNullValue());
     }
 }

@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS audit.north_messages_by_interval (
 	subject text,
 	subject_type text,
 	user text,
-	transaction_id text,
+	local_correlation_id text,
+	global_correlation_id text,
 	sequence_id text,
 	msg_status text,
 	msg_size_bytes int,
@@ -72,7 +73,8 @@ CREATE TABLE IF NOT EXISTS audit.south_messages_by_interval (
 	subject text,
 	subject_type text,
 	user text,
-	transaction_id text,
+	local_correlation_id text,
+	global_correlation_id text,
 	sequence_id text,
 	msg_status text,
 	msg_size_bytes int,
@@ -112,7 +114,8 @@ CREATE TABLE IF NOT EXISTS audit.alarm_messages_by_interval (
 	subject text,
 	subject_type text,
 	user text,
-	transaction_id text,
+	local_correlation_id text,
+	global_correlation_id text,
 	sequence_id text,
 	msg_status text,
 	msg_size_bytes int,
@@ -136,3 +139,14 @@ WHERE subject IS NOT NULL AND user IS NOT NULL and interval IS NOT NULL and occu
 and audit_id IS NOT NULL
 PRIMARY KEY ((subject, user, interval), occur_time, audit_id)
 WITH CLUSTERING ORDER BY (occur_time DESC, audit_id ASC);
+
+/**
+ * PAYLOAD TABLE
+ */
+
+//Q10. Consulta de payloads por audit_id
+CREATE TABLE IF NOT EXISTS audit.payloads_by_audit_id (
+	audit_id uuid,
+	msg_payload list<text>,
+	PRIMARY KEY ((audit_id))
+);

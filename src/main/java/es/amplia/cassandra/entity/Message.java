@@ -22,11 +22,14 @@ public interface Message {
         String SUBJECT_FIELD = "subject";
         String SUBJECT_TYPE_FIELD = "subject_type";
         String USER_FIELD = "user";
-        String TRANSACTION_ID_FIELD = "transaction_id";
+        String LOCAL_CORRELATION_ID_FIELD = "local_correlation_id";
+        String GLOBAL_CORRELATION_ID_FIELD = "global_correlation_id";
         String SEQUENCE_ID_FIELD = "sequence_id";
         String MSG_STATUS_FIELD = "msg_status";
+        String SECURED_FIELD = "secured";
         String MSG_SIZE_BYTES_FIELD = "msg_size_bytes";
         String MSG_CONTEXT_FIELD = "msg_context";
+        String MSG_PAYLOAD_FIELD = "msg_payload";
         String OCCUR_TIME_FIELD = "occur_time";
     }
 
@@ -66,9 +69,13 @@ public interface Message {
 
     void setUser(String user);
 
-    String getTransactionId();
+    String getLocalCorrelationId();
 
-    void setTransactionId(String transactionId);
+    void setLocalCorrelationId(String localCorrelationId);
+
+    String getGlobalCorrelationId();
+
+    void setGlobalCorrelationId(String globalCorrelationId);
 
     String getSequenceId();
 
@@ -77,6 +84,10 @@ public interface Message {
     MsgStatus getMsgStatus();
 
     void setMsgStatus(MsgStatus msgStatus);
+
+    Boolean getSecured();
+
+    void setSecured(Boolean secured);
 
     int getMsgSizeBytes();
 
