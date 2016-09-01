@@ -2,6 +2,7 @@ package es.amplia.cassandra;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.CodecRegistry;
+import com.datastax.driver.core.QueryOptions;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.extras.codecs.enums.EnumNameCodec;
 import es.amplia.model.AuditMessage.*;
@@ -33,6 +34,7 @@ public class TestSpringBootCassandraApplication extends SpringBootCassandraAppli
             Cluster cluster = Cluster.builder()
                     .addContactPoints("127.0.0.1")
                     .withPort(9142)
+                    .withQueryOptions(new QueryOptions().setFetchSize(100))
                     .withCodecRegistry(
                             new CodecRegistry()
                                     .register(new EnumNameCodec<>(ProcessType.class))

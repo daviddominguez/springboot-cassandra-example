@@ -2,12 +2,8 @@ package es.amplia.cassandra.service;
 
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.datastax.driver.mapping.annotations.Param;
 import es.amplia.cassandra.TestSpringBootCassandraApplication;
-import es.amplia.cassandra.entity.Message;
-import es.amplia.cassandra.entity.NorthMessageByInterval;
-import es.amplia.cassandra.entity.NorthMessageByUserInterval;
-import es.amplia.cassandra.entity.NorthMessageByUserSubjectInterval;
+import es.amplia.cassandra.entity.*;
 import es.amplia.model.AuditMessage;
 import es.amplia.model.AuditMessage.*;
 import es.amplia.model.builder.AuditMessageBuilder;
@@ -56,11 +52,11 @@ public class NorthMessagesServiceUnitTest {
         session.execute(truncate(KEYSPACE, NORTH_MESSAGES_BY_INTERVAL_TABLE));
         session.execute(truncate(KEYSPACE, NORTH_MESSAGES_BY_USER_INTERVAL_TABLE));
         session.execute(truncate(KEYSPACE, NORTH_MESSAGES_BY_USER_SUBJECT_INTERVAL_TABLE));
-        given_a_repository_with_a_collection_of_persisted_messages();
     }
 
     @Test
     public void given_a_repository_when_queried_by_specific_interval_then_verify_returned_messages_are_in_that_interval() throws ParseException {
+        given_a_repository_with_a_collection_of_persisted_messages(30);
         Date from = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("02/01/2016 0:00:00");
         Date to = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("29/01/2016 0:00:00");
         List<Row> rows = session.execute(select()
@@ -70,26 +66,49 @@ public class NorthMessagesServiceUnitTest {
                 .where(gte(OCCUR_TIME_FIELD, from))
                 .and(lte(OCCUR_TIME_FIELD, to))).all();
 
-        List<NorthMessageByInterval> northMessagesByInterval = northMessagesService.getMessagesByInterval(from, to);
-        assertThat(northMessagesByInterval, hasSize(rows.size()));
-        for (NorthMessageByInterval message : northMessagesByInterval) {
+        Page<NorthMessageByInterval> response = northMessagesService.getMessagesByInterval(from, to, null);
+        assertThat(response.content, hasSize(rows.size()));
+        for (NorthMessageByInterval message : response.content) {
             verify_abstractMessage_has_all_expected_values(message);
         }
     }
 
     @Test
+    public void given_a_repository_with_more_rows_than_fetch_size_configured_when_queried_by_then_verify_returned_messages_are_paged() throws ParseException {
+        int rowNum = 1000;
+        int fetchSizeConfiguredInCassandraTestConfiguration = 100;
+        given_a_repository_with_a_collection_of_persisted_messages(rowNum);
+        Date from = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("02/01/2016 0:00:00");
+        Date to = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("29/01/2016 0:00:00");
+
+        String page = null;
+        int pagesQueried = 0;
+        do {
+            Page<NorthMessageByInterval> response = northMessagesService.getMessagesByInterval(from, to, page);
+            page = response.pageContext;
+            assertThat(response.content, hasSize(lessThanOrEqualTo(fetchSizeConfiguredInCassandraTestConfiguration)));
+            for (NorthMessageByInterval message : response.content) {
+                verify_abstractMessage_has_all_expected_values(message);
+            }
+            pagesQueried++;
+        }
+        while (page != null);
+        assertThat(rowNum/fetchSizeConfiguredInCassandraTestConfiguration, is(pagesQueried));
+    }
+
+    @Test
     public void given_a_repository_when_queried_by_specific_interval_without_messages_then_verify_returned_messages_is_empty() throws ParseException {
-        given_a_repository_with_a_collection_of_persisted_messages();
+        given_a_repository_with_a_collection_of_persisted_messages(30);
         Date from = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("02/01/1975 0:00:00");
         Date to = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("07/01/1975 0:00:00");
 
-        List<NorthMessageByInterval> northMessagesByInterval = northMessagesService.getMessagesByInterval(from, to);
-        assertThat(northMessagesByInterval, empty());
+        Page<NorthMessageByInterval> response = northMessagesService.getMessagesByInterval(from, to, null);
+        assertThat(response.content, empty());
     }
 
     @Test
     public void given_a_repository_when_queried_by_specific_interval_and_user_then_verify_returned_messages_are_in_that_interval() throws ParseException {
-        given_a_repository_with_a_collection_of_persisted_messages();
+        given_a_repository_with_a_collection_of_persisted_messages(30);
         String user = given_a_list_of_users().get(0);
         Date from = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("02/01/2016 0:00:00");
         Date to = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("29/01/2016 0:00:00");
@@ -101,16 +120,16 @@ public class NorthMessagesServiceUnitTest {
                 .and(lte(OCCUR_TIME_FIELD, to))
                 .and(eq(USER_FIELD, user))).all();
 
-        List<NorthMessageByUserInterval> northMessagesByUserInterval = northMessagesService.getMessagesByUserInterval(user, from, to);
-        assertThat(northMessagesByUserInterval, hasSize(rows.size()));
-        for (NorthMessageByUserInterval message : northMessagesByUserInterval) {
+        Page<NorthMessageByUserInterval> response = northMessagesService.getMessagesByUserInterval(user, from, to, null);
+        assertThat(response.content, hasSize(rows.size()));
+        for (NorthMessageByUserInterval message : response.content) {
             verify_abstractMessage_has_all_expected_values(message);
         }
     }
 
     @Test
     public void given_a_repository_when_queried_by_specific_interval_user_and_subject_then_verify_returned_messages_are_in_that_interval() throws ParseException {
-        given_a_repository_with_a_collection_of_persisted_messages();
+        given_a_repository_with_a_collection_of_persisted_messages(30);
         String user = given_a_list_of_users().get(0);
         String subject = given_a_list_of_subjects().get(0);
         Date from = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("02/01/2016 0:00:00");
@@ -123,48 +142,48 @@ public class NorthMessagesServiceUnitTest {
                 .and(lte(OCCUR_TIME_FIELD, to))
                 .and(eq(USER_FIELD, user)).and(eq(SUBJECT_FIELD, subject))).all();
 
-        List<NorthMessageByUserSubjectInterval> northMessagesByUserSubjectInterval = northMessagesService.getMessagesByUserSubjectInterval(user, subject, from, to);
-        assertThat(northMessagesByUserSubjectInterval, hasSize(rows.size()));
-        for (NorthMessageByUserSubjectInterval message : northMessagesByUserSubjectInterval) {
+        Page<NorthMessageByUserSubjectInterval> response = northMessagesService.getMessagesByUserSubjectInterval(user, subject, from, to, null);
+        assertThat(response.content, hasSize(rows.size()));
+        for (NorthMessageByUserSubjectInterval message : response.content) {
             verify_abstractMessage_has_all_expected_values(message);
         }
     }
 
     @Test
     public void given_a_repository_when_queried_by_a_too_big_interval_then_exception_thrown() throws ParseException {
-        given_a_repository_with_a_collection_of_persisted_messages();
+        given_a_repository_with_a_collection_of_persisted_messages(30);
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("specified time range is too big, be more specific");
         Date from = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("02/01/2016 0:00:00");
         Date to = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("07/03/2016 0:00:00");
 
-        northMessagesService.getMessagesByInterval(from, to);
+        northMessagesService.getMessagesByInterval(from, to, null);
     }
 
     @Test
     public void given_a_repository_when_queried_by_an_user_and_a_too_big_interval_then_exception_thrown() throws ParseException {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("specified time range is too big, be more specific");
-        given_a_repository_with_a_collection_of_persisted_messages();
+        given_a_repository_with_a_collection_of_persisted_messages(30);
         Date from = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("02/01/2016 0:00:00");
         Date to = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("02/05/2016 0:00:00");
 
-        northMessagesService.getMessagesByUserInterval("", from, to);
+        northMessagesService.getMessagesByUserInterval("", from, to, null);
     }
 
     @Test
     public void given_a_repository_when_queried_by_an_user_subject_and_a_too_big_interval_then_exception_thrown() throws ParseException {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("specified time range is too big, be more specific");
-        given_a_repository_with_a_collection_of_persisted_messages();
+        given_a_repository_with_a_collection_of_persisted_messages(30);
         Date from = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("02/01/2016 0:00:00");
         Date to = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("02/01/2017 0:00:00");
 
-        northMessagesService.getMessagesByUserSubjectInterval("", "", from, to);
+        northMessagesService.getMessagesByUserSubjectInterval("", "", from, to, null);
     }
 
-    private void given_a_repository_with_a_collection_of_persisted_messages() throws ParseException {
-        List<AuditMessage> auditMessages = given_a_collection_of_auditMessages();
+    private void given_a_repository_with_a_collection_of_persisted_messages(int num) throws ParseException {
+        List<AuditMessage> auditMessages = given_a_collection_of_auditMessages(num);
         for (AuditMessage auditMessage : auditMessages) {
             northMessagesService.save(auditMessage);
         }
@@ -183,11 +202,12 @@ public class NorthMessagesServiceUnitTest {
                 "28/01/2016T0:00:00.000", "29/01/2016T0:00:00.000", "30/01/2016T0:00:00.000"
         );
     }
-    private List<AuditMessage> given_a_collection_of_auditMessages() throws ParseException {
+
+    private List<AuditMessage> given_a_collection_of_auditMessages(int num) throws ParseException {
         List<String> dates = given_a_collection_of_dates();
         List<AuditMessage> auditMessages = new ArrayList<>();
-        for (String date: dates) {
-            auditMessages.add(given_an_auditMessage(format.parse(date)));
+        for (int i = 0; i < num; i++) {
+            auditMessages.add(given_an_auditMessage(format.parse(dates.get(new Random().nextInt(dates.size())))));
         }
         return auditMessages;
     }

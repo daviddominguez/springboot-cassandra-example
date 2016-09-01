@@ -1,11 +1,12 @@
 package es.amplia.cassandra.repository;
 
 import com.datastax.driver.mapping.MappingManager;
-import com.datastax.driver.mapping.Result;
 import es.amplia.cassandra.accessor.NorthMessagesByUserSubjectIntervalAccessor;
 import es.amplia.cassandra.bucket.Bucket;
 import es.amplia.cassandra.bucket.BucketType;
 import es.amplia.cassandra.entity.NorthMessageByUserSubjectInterval;
+import es.amplia.cassandra.entity.Page;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -25,8 +26,8 @@ public class NorthMessagesByUserSubjectIntervalRepository extends AbstractReposi
         accessor = mappingManager.createAccessor(NorthMessagesByUserSubjectIntervalAccessor.class);
     }
 
-    public Result<NorthMessageByUserSubjectInterval> getMessagesByUserSubjectAndInterval(String user, String subject, Date from, Date to) {
-        List<Long> interval = getInterval(from, to, 2);
-        return accessor.getMessagesByUserSubjectAndInterval(user, subject, interval, from, to);
+    public Page<NorthMessageByUserSubjectInterval> getMessagesByUserSubjectAndInterval(String user, String subject, Date from, Date to, String pagingState) {
+        List<Long> partitions = getPartitions(from, to, 2);
+        return getPagedResult(accessor.getMessagesByUserSubjectAndInterval(user, subject, partitions, from, to), pagingState);
     }
 }

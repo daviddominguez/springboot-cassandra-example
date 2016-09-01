@@ -8,6 +8,7 @@ import es.amplia.cassandra.entity.NorthMessageByUserInterval;
 import es.amplia.cassandra.entity.NorthMessageByUserInterval.NorthMessageByUserIntervalBuilder;
 import es.amplia.cassandra.entity.NorthMessageByUserSubjectInterval;
 import es.amplia.cassandra.entity.NorthMessageByUserSubjectInterval.NorthMessageByUserSubjectIntervalBuilder;
+import es.amplia.cassandra.entity.Page;
 import es.amplia.cassandra.repository.NorthMessagesByIntervalRepository;
 import es.amplia.cassandra.repository.NorthMessagesByUserIntervalRepository;
 import es.amplia.cassandra.repository.NorthMessagesByUserSubjectIntervalRepository;
@@ -16,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
 
 @Service
 public class NorthMessagesServiceImpl implements NorthMessagesService {
@@ -49,17 +49,17 @@ public class NorthMessagesServiceImpl implements NorthMessagesService {
     }
 
     @Override
-    public List<NorthMessageByInterval> getMessagesByInterval(Date from, Date to) {
-        return northMessagesByIntervalRepository.getMessagesByInterval(from, to).all();
+    public Page<NorthMessageByInterval> getMessagesByInterval(Date from, Date to, String pagingState) {
+        return northMessagesByIntervalRepository.getMessagesByInterval(from, to, pagingState);
     }
 
     @Override
-    public List<NorthMessageByUserInterval> getMessagesByUserInterval(String user, Date from, Date to) {
-        return northMessagesByUserIntervalRepository.getMessagesByUserAndInterval(user, from, to).all();
+    public Page<NorthMessageByUserInterval> getMessagesByUserInterval(String user, Date from, Date to, String pagingState) {
+        return northMessagesByUserIntervalRepository.getMessagesByUserAndInterval(user, from, to, pagingState);
     }
 
     @Override
-    public List<NorthMessageByUserSubjectInterval> getMessagesByUserSubjectInterval(String user, String subject, Date from, Date to) {
-        return northMessagesByUserSubjectIntervalRepository.getMessagesByUserSubjectAndInterval(user, subject, from, to).all();
+    public Page<NorthMessageByUserSubjectInterval> getMessagesByUserSubjectInterval(String user, String subject, Date from, Date to, String pagingState) {
+        return northMessagesByUserSubjectIntervalRepository.getMessagesByUserSubjectAndInterval(user, subject, from, to, pagingState);
     }
 }
