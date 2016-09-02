@@ -6,7 +6,6 @@ import es.amplia.cassandra.bucket.Bucket;
 import es.amplia.cassandra.bucket.BucketType;
 import es.amplia.cassandra.entity.NorthMessageByInterval;
 import es.amplia.cassandra.entity.Page;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +15,7 @@ import java.util.List;
 import static es.amplia.cassandra.bucket.Bucket.Type.WEEK;
 
 @Repository
-public class NorthMessagesByIntervalRepository extends AbstractRepository<NorthMessageByInterval> {
+public class NorthMessagesByIntervalRepository extends BucketRepository<NorthMessageByInterval> {
 
     private NorthMessagesByIntervalAccessor accessor;
 

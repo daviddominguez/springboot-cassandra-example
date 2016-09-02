@@ -2,8 +2,8 @@ package es.amplia.cassandra.repository;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Session;
-import com.datastax.driver.core.Statement;
 import es.amplia.cassandra.TestSpringBootCassandraApplication;
+import es.amplia.cassandra.entity.AuditMessageEntity;
 import es.amplia.cassandra.entity.NorthMessageByInterval;
 import es.amplia.model.builder.AuditMessageBuilder;
 import org.junit.Test;
@@ -14,10 +14,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 
 import static es.amplia.cassandra.entity.NorthMessageByInterval.NorthMessageByIntervalBuilder.builder;
-import static es.amplia.cassandra.repository.RepositoryTestUtils.*;
+import static es.amplia.cassandra.repository.AuditEntityRepositoryTestUtils.*;
 import static es.amplia.model.AuditMessage.ComponentType.WEBSOCKET;
 import static es.amplia.model.AuditMessage.MsgDirection.IN;
 import static es.amplia.model.AuditMessage.MsgStatus.SUCCESS;
@@ -27,7 +26,6 @@ import static es.amplia.model.AuditMessage.ProcessType.REST_NORTH;
 import static es.amplia.model.AuditMessage.SubjectType.IMSI;
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 
 @RunWith(SpringRunner.class)
@@ -41,29 +39,24 @@ public class NorthMessagesByIntervalRepositoryTest {
     private Session session;
 
     @Test
-    public void given_a_north_message_by_interval_when_saved_into_repository_then_verify_is_correctly_saved() throws ParseException {
+    public void given_a_north_message_by_interval_when_saved_into_repository_then_verify_is_correctly_saved()
+            throws ParseException {
         NorthMessageByInterval northMessageByInterval = given_a_message_by_interval();
-        Statement statement = when_saved_into_repository(repository, northMessageByInterval);
-        verify_is_correctly_saved(northMessageByInterval, statement);
+        BoundStatement statement = when_saved_into_repository(repository, northMessageByInterval);
+
+        verify_insert_query_is_well_formed(northMessageByInterval, statement,
+                "INSERT INTO audit.north_messages_by_interval");
     }
 
     @Test
-    public void given_a_persisted_north_message_by_interval_when_queried_then_verify_is_expected_message() throws ParseException {
-        NorthMessageByInterval persistedMessage =
-                (NorthMessageByInterval) given_a_persisted_message(given_a_message_by_interval(), session, repository);
+    public void given_a_persisted_north_message_by_interval_when_queried_then_verify_is_expected_message()
+            throws ParseException {
+        AuditMessageEntity persisted = given_a_persisted_message(given_a_message_by_interval(), session, repository);
 
-        NorthMessageByInterval queriedMessage = repository.get(
-                persistedMessage.getInterval(),
-                persistedMessage.getOccurTime(),
-                persistedMessage.getAuditId());
+        NorthMessageByInterval queried =
+                repository.get(persisted.getInterval(), persisted.getOccurTime(), persisted.getId());
 
-        verify_both_messages_are_equal(queriedMessage, persistedMessage);
-    }
-
-    private void verify_is_correctly_saved(NorthMessageByInterval northMessageByInterval, Statement statement) {
-        BoundStatement boundStatement = (BoundStatement) statement;
-        verify_message_parameters_are_correct(northMessageByInterval, boundStatement,
-                "INSERT INTO audit.north_messages_by_interval");
+        verify_both_messages_are_equal(queried, persisted);
     }
 
     private NorthMessageByInterval given_a_message_by_interval() throws ParseException {

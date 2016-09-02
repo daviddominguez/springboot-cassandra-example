@@ -3,11 +3,11 @@ package es.amplia.cassandra.entity;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
 
-import static es.amplia.cassandra.entity.Message.Names.KEYSPACE;
-import static es.amplia.cassandra.entity.Message.Names.NORTH_MESSAGES_BY_USER_INTERVAL_TABLE;
+import static es.amplia.cassandra.entity.AuditMessageEntity.Names.NORTH_MESSAGES_BY_USER_INTERVAL_TABLE;
+import static es.amplia.cassandra.entity.Entity.Names.KEYSPACE;
 
 @Table(keyspace = KEYSPACE, name = NORTH_MESSAGES_BY_USER_INTERVAL_TABLE)
-public class NorthMessageByUserInterval extends AbstractMessage {
+public class NorthMessageByUserInterval extends AuditMessageEntity {
 
     @PartitionKey(1)
     @Override
@@ -15,7 +15,7 @@ public class NorthMessageByUserInterval extends AbstractMessage {
         return super.getUser();
     }
 
-    public static class NorthMessageByUserIntervalBuilder extends AbstractMessageBuilder {
+    public static class NorthMessageByUserIntervalBuilder extends AuditMessageEntityBuilder {
 
         public static NorthMessageByUserIntervalBuilder builder() {
             return new NorthMessageByUserIntervalBuilder();
@@ -24,12 +24,12 @@ public class NorthMessageByUserInterval extends AbstractMessage {
         private NorthMessageByUserIntervalBuilder() {}
 
         @Override
-        protected NorthMessageByUserInterval getMessage() {
-            return (NorthMessageByUserInterval) super.getMessage();
+        protected NorthMessageByUserInterval getEntity() {
+            return (NorthMessageByUserInterval) super.getEntity();
         }
 
         @Override
-        protected AbstractMessage instantiateConcreteMessage() {
+        protected AuditMessageEntity instantiateConcreteAuditMessageEntity() {
             return new NorthMessageByUserInterval();
         }
     }

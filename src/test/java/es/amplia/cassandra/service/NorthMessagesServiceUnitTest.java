@@ -2,6 +2,8 @@ package es.amplia.cassandra.service;
 
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.mapping.Mapper;
+import com.datastax.driver.mapping.MappingManager;
 import es.amplia.cassandra.TestSpringBootCassandraApplication;
 import es.amplia.cassandra.entity.*;
 import es.amplia.model.AuditMessage;
@@ -19,13 +21,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
-import static es.amplia.cassandra.entity.Message.Names.*;
+import static es.amplia.cassandra.entity.AuditMessageEntity.Names.*;
+import static es.amplia.cassandra.entity.Payload.Names.*;
+import static es.amplia.cassandra.entity.Entity.Names.KEYSPACE;
 import static java.text.DateFormat.SHORT;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
@@ -44,6 +45,9 @@ public class NorthMessagesServiceUnitTest {
     @Autowired
     private Session session;
 
+    @Autowired
+    private MappingManager mappingManager;
+
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -52,6 +56,7 @@ public class NorthMessagesServiceUnitTest {
         session.execute(truncate(KEYSPACE, NORTH_MESSAGES_BY_INTERVAL_TABLE));
         session.execute(truncate(KEYSPACE, NORTH_MESSAGES_BY_USER_INTERVAL_TABLE));
         session.execute(truncate(KEYSPACE, NORTH_MESSAGES_BY_USER_SUBJECT_INTERVAL_TABLE));
+        session.execute(truncate(KEYSPACE, PAYLOAD_BY_ID_TABLE));
     }
 
     @Test
@@ -83,16 +88,27 @@ public class NorthMessagesServiceUnitTest {
 
         String page = null;
         int pagesQueried = 0;
+        List<NorthMessageByInterval> pagedRows = new ArrayList<>();
+
+        Mapper<NorthMessageByInterval> mapper = mappingManager.mapper(NorthMessageByInterval.class);
+        List<NorthMessageByInterval> fetchedRows = mapper.map(session.execute(select()
+                .all()
+                .from(KEYSPACE, NORTH_MESSAGES_BY_INTERVAL_TABLE)
+                .allowFiltering()
+                .where(gte(OCCUR_TIME_FIELD, from))
+                .and(lte(OCCUR_TIME_FIELD, to)))).all();
         do {
             Page<NorthMessageByInterval> response = northMessagesService.getMessagesByInterval(from, to, page);
             page = response.pageContext;
             assertThat(response.content, hasSize(lessThanOrEqualTo(fetchSizeConfiguredInCassandraTestConfiguration)));
+            pagedRows.addAll(response.content);
             for (NorthMessageByInterval message : response.content) {
                 verify_abstractMessage_has_all_expected_values(message);
             }
             pagesQueried++;
         }
         while (page != null);
+        assertThat(pagedRows, containsInAnyOrder(fetchedRows.toArray()));
         assertThat(rowNum/fetchSizeConfiguredInCassandraTestConfiguration, is(pagesQueried));
     }
 
@@ -261,24 +277,35 @@ public class NorthMessagesServiceUnitTest {
                 .build();
     }
 
-    private void verify_abstractMessage_has_all_expected_values(Message message) throws ParseException {
-        assertThat(message.getInterval(), notNullValue());
-        assertThat(message.getAuditId(), notNullValue());
-        assertThat(message.getComponentType(), isIn(ComponentType.values()));
-        assertThat(message.getMsgName(), isIn(NameType.values()));
-        assertThat(message.getMsgType(), isIn(MsgType.values()));
-        assertThat(message.getMsgDirection(), isIn(MsgDirection.values()));
-        assertThat(message.getSubject(), anyOf(isIn(given_a_list_of_subjects()), equalTo("subjectA")));
-        assertThat(message.getSubjectType(), isIn(SubjectType.values()));
-        assertThat(message.getUser(), anyOf(isIn(given_a_list_of_users()), equalTo("userA")));
-        assertThat(message.getLocalCorrelationId(), isIn(given_a_list_of_local_correlation_ids()));
-        assertThat(message.getGlobalCorrelationId(), isIn(given_a_list_of_global_correlation_ids()));
-        assertThat(message.getSequenceId(), isIn(given_a_list_of_sequence_ids()));
-        assertThat(message.getMsgStatus(), isIn(MsgStatus.values()));
-        assertThat(message.getSecured(), notNullValue());
-        assertThat(message.getMsgSizeBytes(), is(100));
-        assertThat(message.getMsgContext(), hasKey("context_key"));
-        assertThat(message.getMsgContext(), hasValue("context_value"));
-        assertThat(message.getOccurTime(), notNullValue());
+    private void verify_abstractMessage_has_all_expected_values(AuditMessageEntity auditMessageEntity) throws ParseException {
+        assertThat(auditMessageEntity.getInterval(), notNullValue());
+        assertThat(auditMessageEntity.getId(), notNullValue());
+        assertThat(auditMessageEntity.getComponentType(), isIn(ComponentType.values()));
+        assertThat(auditMessageEntity.getMsgName(), isIn(NameType.values()));
+        assertThat(auditMessageEntity.getMsgType(), isIn(MsgType.values()));
+        assertThat(auditMessageEntity.getMsgDirection(), isIn(MsgDirection.values()));
+        assertThat(auditMessageEntity.getSubject(), anyOf(isIn(given_a_list_of_subjects()), equalTo("subjectA")));
+        assertThat(auditMessageEntity.getSubjectType(), isIn(SubjectType.values()));
+        assertThat(auditMessageEntity.getUser(), anyOf(isIn(given_a_list_of_users()), equalTo("userA")));
+        assertThat(auditMessageEntity.getLocalCorrelationId(), isIn(given_a_list_of_local_correlation_ids()));
+        assertThat(auditMessageEntity.getGlobalCorrelationId(), isIn(given_a_list_of_global_correlation_ids()));
+        assertThat(auditMessageEntity.getSequenceId(), isIn(given_a_list_of_sequence_ids()));
+        assertThat(auditMessageEntity.getMsgStatus(), isIn(MsgStatus.values()));
+        assertThat(auditMessageEntity.getSecured(), notNullValue());
+        assertThat(auditMessageEntity.getMsgSizeBytes(), is(100));
+        assertThat(auditMessageEntity.getMsgContext(), hasKey("context_key"));
+        assertThat(auditMessageEntity.getMsgContext(), hasValue("context_value"));
+        assertThat(auditMessageEntity.getPayloadId(), notNullValue());
+        assertThat(auditMessageEntity.getOccurTime(), notNullValue());
+        verify_payload_row_exists(auditMessageEntity.getPayloadId());
+    }
+
+    private void verify_payload_row_exists(UUID id) {
+        Mapper<Payload> mapper = mappingManager.mapper(Payload.class);
+        Payload payload = mapper.map(session.execute(select()
+                .all()
+                .from(KEYSPACE, PAYLOAD_BY_ID_TABLE)
+                .where(eq(Payload.Names.ID_FIELD, id)))).one();
+        assertThat(payload, notNullValue());
     }
 }

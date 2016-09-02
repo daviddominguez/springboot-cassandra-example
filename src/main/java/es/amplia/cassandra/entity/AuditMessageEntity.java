@@ -9,19 +9,43 @@ import es.amplia.model.AuditMessage;
 import es.amplia.model.AuditMessage.*;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Objects.equal;
-import static es.amplia.cassandra.entity.Message.Names.*;
+import static es.amplia.cassandra.entity.AuditMessageEntity.Names.*;
 
-abstract class AbstractMessage implements Message {
+public abstract class AuditMessageEntity implements BucketEntity {
+
+    public interface Names {
+        String NORTH_MESSAGES_BY_INTERVAL_TABLE = "north_messages_by_interval";
+        String NORTH_MESSAGES_BY_USER_INTERVAL_TABLE = "north_messages_by_user_and_interval";
+        String NORTH_MESSAGES_BY_USER_SUBJECT_INTERVAL_TABLE = "north_messages_by_user_subject_and_interval";
+
+        String INTERVAL_FIELD = "interval";
+        String ID_FIELD = "id";
+        String COMPONENT_TYPE_FIELD = "component_type";
+        String MSG_NAME_FIELD = "msg_name";
+        String MSG_TYPE_FIELD = "msg_type";
+        String MSG_DIRECTION_FIELD = "msg_direction";
+        String SUBJECT_FIELD = "subject";
+        String SUBJECT_TYPE_FIELD = "subject_type";
+        String USER_FIELD = "user";
+        String LOCAL_CORRELATION_ID_FIELD = "local_correlation_id";
+        String GLOBAL_CORRELATION_ID_FIELD = "global_correlation_id";
+        String SEQUENCE_ID_FIELD = "sequence_id";
+        String MSG_STATUS_FIELD = "msg_status";
+        String SECURED_FIELD = "secured";
+        String MSG_SIZE_BYTES_FIELD = "msg_size_bytes";
+        String MSG_CONTEXT_FIELD = "msg_context";
+        String PAYLOAD_ID_FIELD = "payload_id";
+        String OCCUR_TIME_FIELD = "occur_time";
+    }
 
     private long interval;
 
-    private UUID auditId;
+    private UUID id;
 
     private ComponentType componentType;
 
@@ -51,6 +75,8 @@ abstract class AbstractMessage implements Message {
 
     private Map<String, String> msgContext;
 
+    private UUID payloadId;
+
     private Date occurTime;
 
     @PartitionKey(0)
@@ -66,169 +92,150 @@ abstract class AbstractMessage implements Message {
     }
 
     @ClusteringColumn(1)
-    @Column(name = AUDIT_ID_FIELD)
+    @Column(name = ID_FIELD)
     @Override
-    public UUID getAuditId() {
-        return auditId;
+    public UUID getId() {
+        return id;
     }
 
     @Override
-    public void setAuditId(UUID auditId) {
-        this.auditId = auditId;
+    public void setId(UUID auditId) {
+        this.id = auditId;
     }
 
     @Column(name = COMPONENT_TYPE_FIELD)
-    @Override
     public ComponentType getComponentType() {
         return componentType;
     }
 
-    @Override
     public void setComponentType(ComponentType componentType) {
         this.componentType = componentType;
     }
 
     @Column(name = MSG_NAME_FIELD)
-    @Override
     public NameType getMsgName() {
         return msgName;
     }
 
-    @Override
     public void setMsgName(NameType msgName) {
         this.msgName = msgName;
     }
 
     @Column(name = MSG_TYPE_FIELD)
-    @Override
     public MsgType getMsgType() {
         return msgType;
     }
 
-    @Override
     public void setMsgType(MsgType msgType) {
         this.msgType = msgType;
     }
 
     @Column(name = MSG_DIRECTION_FIELD)
-    @Override
     public MsgDirection getMsgDirection() {
         return msgDirection;
     }
 
-    @Override
     public void setMsgDirection(MsgDirection msgDirection) {
         this.msgDirection = msgDirection;
     }
 
     @Column(name = SUBJECT_FIELD)
-    @Override
     public String getSubject() {
         return subject;
     }
 
-    @Override
     public void setSubject(String subject) {
         this.subject = subject;
     }
 
     @Column(name = SUBJECT_TYPE_FIELD)
-    @Override
     public SubjectType getSubjectType() {
         return subjectType;
     }
 
-    @Override
     public void setSubjectType(SubjectType subjectType) {
         this.subjectType = subjectType;
     }
 
     @Column(name = USER_FIELD)
-    @Override
     public String getUser() {
         return user;
     }
 
-    @Override
     public void setUser(String user) {
         this.user = user;
     }
 
     @Column(name = LOCAL_CORRELATION_ID_FIELD)
-    @Override
     public String getLocalCorrelationId() {
         return localCorrelationId;
     }
 
-    @Override
     public void setLocalCorrelationId(String localCorrelationId) {
         this.localCorrelationId = localCorrelationId;
     }
 
     @Column(name = GLOBAL_CORRELATION_ID_FIELD)
-    @Override
     public String getGlobalCorrelationId() {
         return globalCorrelationId;
     }
 
-    @Override
     public void setGlobalCorrelationId(String globalCorrelationId) {
         this.globalCorrelationId = globalCorrelationId;
     }
 
     @Column(name = SEQUENCE_ID_FIELD)
-    @Override
     public String getSequenceId() {
         return sequenceId;
     }
 
-    @Override
     public void setSequenceId(String sequenceId) {
         this.sequenceId = sequenceId;
     }
 
     @Column(name = MSG_STATUS_FIELD)
-    @Override
     public MsgStatus getMsgStatus() {
         return msgStatus;
     }
 
-    @Override
     public void setMsgStatus(MsgStatus msgStatus) {
         this.msgStatus = msgStatus;
     }
 
     @Column(name = SECURED_FIELD)
-    @Override
     public Boolean getSecured() {
         return secured;
     }
 
-    @Override
     public void setSecured(Boolean secured) {
         this.secured = secured;
     }
 
     @Column(name = MSG_SIZE_BYTES_FIELD)
-    @Override
     public int getMsgSizeBytes() {
         return msgSizeBytes;
     }
 
-    @Override
     public void setMsgSizeBytes(int msgSizeBytes) {
         this.msgSizeBytes = msgSizeBytes;
     }
 
     @Column(name = MSG_CONTEXT_FIELD, codec = MsgContextCodec.class)
-    @Override
     public Map<String, String> getMsgContext() {
         return msgContext;
     }
 
-    @Override
     public void setMsgContext(Map<String, String> msgContext) {
         this.msgContext = msgContext;
+    }
+
+    @Column(name = PAYLOAD_ID_FIELD)
+    public UUID getPayloadId() {
+        return payloadId;
+    }
+
+    public void setPayloadId(UUID payloadId) {
+        this.payloadId = payloadId;
     }
 
     @Column(name = OCCUR_TIME_FIELD)
@@ -246,11 +253,11 @@ abstract class AbstractMessage implements Message {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof AbstractMessage)) return false;
-        AbstractMessage that = (AbstractMessage) o;
+        if (!(o instanceof AuditMessageEntity)) return false;
+        AuditMessageEntity that = (AuditMessageEntity) o;
         return equal(interval, that.interval) &&
                 equal(msgSizeBytes, that.msgSizeBytes) &&
-                equal(auditId, that.auditId) &&
+                equal(id, that.id) &&
                 equal(componentType, that.componentType) &&
                 equal(msgName, that.msgName) &&
                 equal(msgType, that.msgType) &&
@@ -269,7 +276,7 @@ abstract class AbstractMessage implements Message {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(interval, auditId, componentType, msgName, msgType, msgDirection, subject,
+        return Objects.hashCode(interval, id, componentType, msgName, msgType, msgDirection, subject,
                 subjectType, user, localCorrelationId, globalCorrelationId, sequenceId, msgStatus, secured,
                 msgSizeBytes, msgContext, occurTime);
     }
@@ -278,7 +285,7 @@ abstract class AbstractMessage implements Message {
     public String toString() {
         return toStringHelper(this)
                 .add("interval", interval)
-                .add("auditId", auditId)
+                .add("id", id)
                 .add("componentType", componentType)
                 .add("msgName", msgName)
                 .add("msgType", msgType)
@@ -298,25 +305,25 @@ abstract class AbstractMessage implements Message {
                 .toString();
     }
 
-    static abstract class AbstractMessageBuilder {
+    public static abstract class AuditMessageEntityBuilder {
 
-        private final AbstractMessage message;
+        private final AuditMessageEntity entity;
 
-        protected AbstractMessageBuilder() {
-            message = instantiateConcreteMessage();
+        protected AuditMessageEntityBuilder() {
+            entity = instantiateConcreteAuditMessageEntity();
         }
 
-        protected AbstractMessage getMessage() {
-            return message;
+        protected AuditMessageEntity getEntity() {
+            return entity;
         }
 
-        protected abstract AbstractMessage instantiateConcreteMessage();
+        protected abstract AuditMessageEntity instantiateConcreteAuditMessageEntity();
 
-        public final AbstractMessage build() {
-            return getMessage();
+        public final AuditMessageEntity build() {
+            return getEntity();
         }
 
-        public final AbstractMessage build(AuditMessage auditMessage) {
+        public final AuditMessageEntity build(AuditMessage auditMessage) {
             return this.componentType(auditMessage.getComponent())
                     .msgName(auditMessage.getMsgName())
                     .msgType(auditMessage.getMsgType())
@@ -335,88 +342,93 @@ abstract class AbstractMessage implements Message {
                     .build();
         }
 
-        public AbstractMessageBuilder interval(long interval) {
-            message.setInterval(interval);
+        public AuditMessageEntityBuilder interval(long interval) {
+            entity.setInterval(interval);
             return this;
         }
 
-        public AbstractMessageBuilder auditId(UUID auditId) {
-            message.setAuditId(auditId);
+        public AuditMessageEntityBuilder id(UUID id) {
+            entity.setId(id);
             return this;
         }
 
-        public AbstractMessageBuilder componentType(ComponentType component) {
-            message.setComponentType(component);
+        public AuditMessageEntityBuilder componentType(ComponentType component) {
+            entity.setComponentType(component);
             return this;
         }
 
-        public AbstractMessageBuilder msgName(NameType msgName) {
-            message.setMsgName(msgName);
+        public AuditMessageEntityBuilder msgName(NameType msgName) {
+            entity.setMsgName(msgName);
             return this;
         }
 
-        public AbstractMessageBuilder msgType(MsgType msgType) {
-            message.setMsgType(msgType);
+        public AuditMessageEntityBuilder msgType(MsgType msgType) {
+            entity.setMsgType(msgType);
             return this;
         }
 
-        public AbstractMessageBuilder msgDirection(MsgDirection msgDirection) {
-            message.setMsgDirection(msgDirection);
+        public AuditMessageEntityBuilder msgDirection(MsgDirection msgDirection) {
+            entity.setMsgDirection(msgDirection);
             return this;
         }
 
-        public AbstractMessageBuilder subject(String subject) {
-            message.setSubject(subject);
+        public AuditMessageEntityBuilder subject(String subject) {
+            entity.setSubject(subject);
             return this;
         }
 
-        public AbstractMessageBuilder subjectType(SubjectType subjectType) {
-            message.setSubjectType(subjectType);
+        public AuditMessageEntityBuilder subjectType(SubjectType subjectType) {
+            entity.setSubjectType(subjectType);
             return this;
         }
 
-        public AbstractMessageBuilder user(String user) {
-            message.setUser(user);
+        public AuditMessageEntityBuilder user(String user) {
+            entity.setUser(user);
             return this;
         }
 
-        public AbstractMessageBuilder localCorrelationId(String localCorrelationId) {
-            message.setLocalCorrelationId(localCorrelationId);
+        public AuditMessageEntityBuilder localCorrelationId(String localCorrelationId) {
+            entity.setLocalCorrelationId(localCorrelationId);
             return this;
         }
 
-        public AbstractMessageBuilder globalCorrelationId(String globalCorrelationId) {
-            message.setGlobalCorrelationId(globalCorrelationId);
+        public AuditMessageEntityBuilder globalCorrelationId(String globalCorrelationId) {
+            entity.setGlobalCorrelationId(globalCorrelationId);
             return this;
         }
 
-        public AbstractMessageBuilder sequenceId(String sequenceId) {
-            message.setSequenceId(sequenceId);
+        public AuditMessageEntityBuilder sequenceId(String sequenceId) {
+            entity.setSequenceId(sequenceId);
             return this;
         }
 
-        public AbstractMessageBuilder msgStatus(MsgStatus msgStatus) {
-            message.setMsgStatus(msgStatus);
+        public AuditMessageEntityBuilder msgStatus(MsgStatus msgStatus) {
+            entity.setMsgStatus(msgStatus);
             return this;
         }
 
-        public AbstractMessageBuilder secured(Boolean secured) {
-            message.setSecured(secured);
+        public AuditMessageEntityBuilder secured(Boolean secured) {
+            entity.setSecured(secured);
             return this;
         }
 
-        public AbstractMessageBuilder msgSizeBytes(int msgSizeBytes) {
-            message.setMsgSizeBytes(msgSizeBytes);
+        public AuditMessageEntityBuilder msgSizeBytes(int msgSizeBytes) {
+            entity.setMsgSizeBytes(msgSizeBytes);
             return this;
         }
 
-        public AbstractMessageBuilder msgContext(Map<String, String> msgContext) {
-            message.setMsgContext(msgContext);
+        public AuditMessageEntityBuilder msgContext(Map<String, String> msgContext) {
+            entity.setMsgContext(msgContext);
             return this;
         }
 
-        public AbstractMessageBuilder occurTime(Date timestamp) {
-            message.setOccurTime(timestamp);
+        public AuditMessageEntityBuilder occurTime(Date timestamp) {
+            entity.setOccurTime(timestamp);
+            return this;
+        }
+
+        public AuditMessageEntityBuilder payloadId(UUID payloadId) {
+            entity.setPayloadId(payloadId);
             return this;
         }
     }
