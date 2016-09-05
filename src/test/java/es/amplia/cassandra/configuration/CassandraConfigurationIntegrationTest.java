@@ -23,7 +23,7 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestSpringBootCassandraApplication.class)
-public class CassandraConfigurationUnitTest {
+public class CassandraConfigurationIntegrationTest {
 
     @Autowired
     private Cluster cluster;

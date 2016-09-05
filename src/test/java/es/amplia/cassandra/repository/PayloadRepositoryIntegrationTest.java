@@ -23,7 +23,7 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestSpringBootCassandraApplication.class)
-public class PayloadRepositoryTest {
+public class PayloadRepositoryIntegrationTest {
 
     @Autowired
     private PayloadRepository repository;

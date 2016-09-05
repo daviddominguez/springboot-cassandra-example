@@ -2,6 +2,7 @@ package es.amplia.cassandra.service;
 
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.exceptions.PagingStateException;
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
 import es.amplia.cassandra.TestSpringBootCassandraApplication;
@@ -35,7 +36,7 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestSpringBootCassandraApplication.class)
-public class NorthMessagesServiceUnitTest {
+public class NorthMessagesServiceIntegrationTest {
 
     private DateFormat format = new SimpleDateFormat("dd/MM/yyyy'T'H:mm:ss.SSS");
 
@@ -174,6 +175,7 @@ public class NorthMessagesServiceUnitTest {
         Page<NorthMessageByUserInterval> response = northMessagesService.getMessagesByUserInterval(user, from, to, null);
         assertThat(response.content, hasSize(rows.size()));
         for (NorthMessageByUserInterval message : response.content) {
+            assertThat(message.getUser(), is(user));
             verify_abstractMessage_has_all_expected_values(message);
         }
     }
@@ -196,8 +198,41 @@ public class NorthMessagesServiceUnitTest {
         Page<NorthMessageByUserSubjectInterval> response = northMessagesService.getMessagesByUserSubjectInterval(user, subject, from, to, null);
         assertThat(response.content, hasSize(rows.size()));
         for (NorthMessageByUserSubjectInterval message : response.content) {
+            assertThat(message.getUser(), is(user));
+            assertThat(message.getSubject(), is(subject));
             verify_abstractMessage_has_all_expected_values(message);
         }
+    }
+
+    @Test
+    public void given_an_auditMessage_when_saved_then_its_persisted_into_all_related_tables() {
+        Date occurTime = new Date();
+        AuditMessage auditMessage = given_an_auditMessage(occurTime);
+        when_saved(auditMessage);
+
+        List<Row> northMessagesByInterval = session.execute(select().all()
+                .from(KEYSPACE, NORTH_MESSAGES_BY_INTERVAL_TABLE).allowFiltering()
+                .where(eq(OCCUR_TIME_FIELD, occurTime))).all();
+        List<Row> northMessagesByUserInterval = session.execute(select().all()
+                .from(KEYSPACE, NORTH_MESSAGES_BY_USER_INTERVAL_TABLE).allowFiltering()
+                .where(eq(OCCUR_TIME_FIELD, occurTime))).all();
+        List<Row> northMessagesByUserSubjectInterval = session.execute(select().all()
+                .from(KEYSPACE, NORTH_MESSAGES_BY_USER_SUBJECT_INTERVAL_TABLE).allowFiltering()
+                .where(eq(OCCUR_TIME_FIELD, occurTime))).all();
+        assertThat(northMessagesByInterval, hasSize(1));
+        assertThat(northMessagesByUserInterval, hasSize(1));
+        assertThat(northMessagesByUserSubjectInterval, hasSize(1));
+        verify_payload_row_exists(northMessagesByInterval.get(0).getUUID(PAYLOAD_ID_FIELD));
+    }
+
+    @Test
+    public void given_a_repository_when_queried_with_wrong_paging_state_then_exception_thrown() throws ParseException {
+        given_a_repository_with_a_collection_of_persisted_messages(30);
+        expectedException.expect(PagingStateException.class);
+        Date from = new Date();
+        Date to = new Date();
+
+        northMessagesService.getMessagesByInterval(from, to, "wrongPagingState");
     }
 
     @Test
@@ -236,8 +271,12 @@ public class NorthMessagesServiceUnitTest {
     private void given_a_repository_with_a_collection_of_persisted_messages(int num) throws ParseException {
         List<AuditMessage> auditMessages = given_a_collection_of_auditMessages(num);
         for (AuditMessage auditMessage : auditMessages) {
-            northMessagesService.save(auditMessage);
+            when_saved(auditMessage);
         }
+    }
+
+    private void when_saved(AuditMessage auditMessage) {
+        northMessagesService.save(auditMessage);
     }
 
     private List<String> given_a_collection_of_dates() {

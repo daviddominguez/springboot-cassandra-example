@@ -30,7 +30,7 @@ import static java.util.Collections.singletonMap;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestSpringBootCassandraApplication.class)
-public class NorthMessagesByUserIntervalRepositoryTest {
+public class NorthMessagesByUserIntervalRepositoryIntegrationTest {
 
     @Autowired
     private NorthMessagesByUserIntervalRepository repository;
