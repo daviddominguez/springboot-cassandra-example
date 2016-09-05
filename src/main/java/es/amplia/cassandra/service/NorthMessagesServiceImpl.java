@@ -15,11 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Service
-public class NorthMessagesServiceImpl implements NorthMessagesService {
+class NorthMessagesServiceImpl implements NorthMessagesService {
 
     private Session session;
     private NorthMessagesByIntervalRepository northMessagesByIntervalRepository;
@@ -64,17 +63,40 @@ public class NorthMessagesServiceImpl implements NorthMessagesService {
 
     @Override
     public Page<NorthMessageByInterval> getMessagesByInterval(Date from, Date to, String pagingState) {
-        return northMessagesByIntervalRepository.getMessagesByInterval(from, to, pagingState);
+        return northMessagesByIntervalRepository.getMessagesByInterval(from, to, pagingState, null);
     }
 
     @Override
-    public Page<NorthMessageByUserInterval> getMessagesByUserInterval(String user, Date from, Date to, String pagingState) {
-        return northMessagesByUserIntervalRepository.getMessagesByUserAndInterval(user, from, to, pagingState);
+    public Page<NorthMessageByInterval> getMessagesByInterval(Date from, Date to, String pagingState, int fetchSize) {
+        return northMessagesByIntervalRepository.getMessagesByInterval(from, to, pagingState, fetchSize);
     }
 
     @Override
-    public Page<NorthMessageByUserSubjectInterval> getMessagesByUserSubjectInterval(String user, String subject, Date from, Date to, String pagingState) {
-        return northMessagesByUserSubjectIntervalRepository.getMessagesByUserSubjectAndInterval(user, subject, from, to, pagingState);
+    public Page<NorthMessageByUserInterval> getMessagesByUserInterval(String user, Date from, Date to,
+                                                                      String pagingState) {
+        return northMessagesByUserIntervalRepository.getMessagesByUserInterval(user, from, to, pagingState, null);
+    }
+
+    @Override
+    public Page<NorthMessageByUserInterval> getMessagesByUserInterval(String user, Date from, Date to,
+                                                                      String pagingState, int fetchSize) {
+        return northMessagesByUserIntervalRepository.getMessagesByUserInterval(user, from, to, pagingState, fetchSize);
+    }
+
+    @Override
+    public Page<NorthMessageByUserSubjectInterval> getMessagesByUserSubjectInterval(String user, String subject,
+                                                                                    Date from, Date to,
+                                                                                    String pagingState) {
+        return northMessagesByUserSubjectIntervalRepository.getMessagesByUserSubjectInterval(user, subject, from, to,
+                pagingState, null);
+    }
+
+    @Override
+    public Page<NorthMessageByUserSubjectInterval> getMessagesByUserSubjectInterval(String user, String subject,
+                                                                                    Date from, Date to,
+                                                                                    String pagingState, int fetchSize) {
+        return northMessagesByUserSubjectIntervalRepository.getMessagesByUserSubjectInterval(user, subject, from, to,
+                pagingState, fetchSize);
     }
 
     @Override

@@ -25,8 +25,9 @@ public class NorthMessagesByUserIntervalRepository extends BucketRepository<Nort
         accessor = mappingManager.createAccessor(NorthMessagesByUserIntervalAccessor.class);
     }
 
-    public Page<NorthMessageByUserInterval> getMessagesByUserAndInterval(String user, Date from, Date to, String pagingState) {
+    public Page<NorthMessageByUserInterval> getMessagesByUserInterval(String user, Date from, Date to,
+                                                                      String pagingState, Integer fetchSize) {
         List<Long> partitions = getPartitions(from, to, 4);
-        return getPagedResult(accessor.getMessagesByUserAndInterval(user, partitions, from, to), pagingState);
+        return getPagedResult(accessor.getMessagesByUserInterval(user, partitions, from, to), pagingState, fetchSize);
     }
 }

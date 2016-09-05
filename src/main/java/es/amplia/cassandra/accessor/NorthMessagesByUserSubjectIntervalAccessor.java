@@ -14,7 +14,7 @@ public interface NorthMessagesByUserSubjectIntervalAccessor {
 
     @Query("SELECT * FROM audit.north_messages_by_user_subject_and_interval WHERE user=:user AND subject=:subject AND interval IN :intervals and occur_time >= :fromDate and occur_time <= :toDate")
     @QueryParameters(idempotent = true)
-    Statement getMessagesByUserSubjectAndInterval(
+    Statement getMessagesByUserSubjectInterval(
             @Param("user") String user,
             @Param("subject") String subject,
             @Param("intervals") List<Long> intervals,

@@ -81,7 +81,7 @@ public class NorthMessagesServiceUnitTest {
     @Test
     public void given_a_repository_with_more_rows_than_fetch_size_configured_when_queried_by_then_verify_returned_messages_are_paged() throws ParseException {
         int rowNum = 1000;
-        int fetchSizeConfiguredInCassandraTestConfiguration = 100;
+        int fetchSize = 100;
         given_a_repository_with_a_collection_of_persisted_messages(rowNum);
         Date from = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("02/01/2016 0:00:00");
         Date to = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("29/01/2016 0:00:00");
@@ -98,9 +98,9 @@ public class NorthMessagesServiceUnitTest {
                 .where(gte(OCCUR_TIME_FIELD, from))
                 .and(lte(OCCUR_TIME_FIELD, to)))).all();
         do {
-            Page<NorthMessageByInterval> response = northMessagesService.getMessagesByInterval(from, to, page);
+            Page<NorthMessageByInterval> response = northMessagesService.getMessagesByInterval(from, to, page, fetchSize);
             page = response.pageContext;
-            assertThat(response.content, hasSize(lessThanOrEqualTo(fetchSizeConfiguredInCassandraTestConfiguration)));
+            assertThat(response.content, hasSize(lessThanOrEqualTo(fetchSize)));
             pagedRows.addAll(response.content);
             for (NorthMessageByInterval message : response.content) {
                 verify_abstractMessage_has_all_expected_values(message);
@@ -109,7 +109,42 @@ public class NorthMessagesServiceUnitTest {
         }
         while (page != null);
         assertThat(pagedRows, containsInAnyOrder(fetchedRows.toArray()));
-        assertThat(rowNum/fetchSizeConfiguredInCassandraTestConfiguration, is(pagesQueried));
+        assertThat(rowNum/fetchSize, is(pagesQueried));
+    }
+
+    @Test
+    public void given_a_repository_with_more_rows_than_fetch_size_configured_when_queried_changing_page_size_then_verify_returned_messages_are_paged() throws ParseException {
+        int numRowsInRepository = 1000;
+        int fetchSize = 50;
+        given_a_repository_with_a_collection_of_persisted_messages(numRowsInRepository);
+        Date from = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("02/01/2016 0:00:00");
+        Date to = DateFormat.getDateTimeInstance(SHORT, SHORT).parse("29/01/2016 0:00:00");
+
+        String page = null;
+        int pagesQueried = 0;
+        List<NorthMessageByInterval> pagedRows = new ArrayList<>();
+
+        Mapper<NorthMessageByInterval> mapper = mappingManager.mapper(NorthMessageByInterval.class);
+        List<NorthMessageByInterval> fetchedRows = mapper.map(session.execute(select()
+                .all()
+                .from(KEYSPACE, NORTH_MESSAGES_BY_INTERVAL_TABLE)
+                .allowFiltering()
+                .where(gte(OCCUR_TIME_FIELD, from))
+                .and(lte(OCCUR_TIME_FIELD, to)))).all();
+        do {
+            Page<NorthMessageByInterval> response = northMessagesService.getMessagesByInterval(from, to, page, fetchSize);
+            page = response.pageContext;
+            assertThat(response.content, hasSize(lessThanOrEqualTo(fetchSize)));
+            pagedRows.addAll(response.content);
+            for (NorthMessageByInterval message : response.content) {
+                verify_abstractMessage_has_all_expected_values(message);
+            }
+            pagesQueried++;
+            fetchSize *= 2;
+        }
+        while (page != null);
+        assertThat(pagedRows, containsInAnyOrder(fetchedRows.toArray()));
+        assertThat(pagesQueried, is(5));
     }
 
     @Test

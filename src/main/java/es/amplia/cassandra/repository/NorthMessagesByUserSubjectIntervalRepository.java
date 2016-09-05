@@ -20,13 +20,18 @@ public class NorthMessagesByUserSubjectIntervalRepository extends BucketReposito
     private NorthMessagesByUserSubjectIntervalAccessor accessor;
 
     @Autowired
-    public NorthMessagesByUserSubjectIntervalRepository(MappingManager mappingManager, @BucketType(SEMESTER) Bucket bucket) {
+    public NorthMessagesByUserSubjectIntervalRepository(MappingManager mappingManager,
+                                                        @BucketType(SEMESTER) Bucket bucket) {
         super(mappingManager, NorthMessageByUserSubjectInterval.class, bucket);
         accessor = mappingManager.createAccessor(NorthMessagesByUserSubjectIntervalAccessor.class);
     }
 
-    public Page<NorthMessageByUserSubjectInterval> getMessagesByUserSubjectAndInterval(String user, String subject, Date from, Date to, String pagingState) {
+    public Page<NorthMessageByUserSubjectInterval> getMessagesByUserSubjectInterval(String user, String subject,
+                                                                                    Date from, Date to,
+                                                                                    String pagingState,
+                                                                                    Integer fetchSize) {
         List<Long> partitions = getPartitions(from, to, 2);
-        return getPagedResult(accessor.getMessagesByUserSubjectAndInterval(user, subject, partitions, from, to), pagingState);
+        return getPagedResult(
+                accessor.getMessagesByUserSubjectInterval(user, subject, partitions, from, to), pagingState, fetchSize);
     }
 }

@@ -32,7 +32,10 @@ class Repository<T extends Entity> {
         return mapper.get(id);
     }
 
-    Page<T> getPagedResult(Statement statement, String previousPagingState) {
+    Page<T> getPagedResult(Statement statement, String previousPagingState, Integer fetchSize) {
+        if (fetchSize != null) {
+            statement.setFetchSize(fetchSize);
+        }
         if (previousPagingState != null ) {
             statement.setPagingState(PagingState.fromString(previousPagingState));
         }
