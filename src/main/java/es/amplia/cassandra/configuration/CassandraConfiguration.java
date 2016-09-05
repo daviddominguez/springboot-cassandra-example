@@ -6,6 +6,7 @@ import com.datastax.driver.mapping.MappingManager;
 import es.amplia.cassandra.bucket.*;
 import es.amplia.cassandra.repository.NorthMessagesByIntervalRepository;
 import es.amplia.cassandra.service.NorthMessagesService;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScans;
@@ -18,10 +19,13 @@ import static es.amplia.cassandra.bucket.Bucket.Type.*;
     @ComponentScan(basePackageClasses = {NorthMessagesByIntervalRepository.class}),
         @ComponentScan(basePackageClasses = {NorthMessagesService.class})
 })
-public class CassandraConfiguration {
+public class CassandraConfiguration implements DisposableBean {
+
+    private Cluster cluster;
 
     @Bean
     public Session session(Cluster cluster) {
+        this.cluster = cluster;
         return cluster.connect();
     }
 
@@ -46,5 +50,10 @@ public class CassandraConfiguration {
     @BucketType(SEMESTER)
     public Bucket semesterBucket() {
         return new SemesterBucket();
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        cluster.close();
     }
 }
