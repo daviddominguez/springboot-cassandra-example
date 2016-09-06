@@ -22,6 +22,12 @@ public abstract class AuditMessageEntity implements BucketEntity {
         String NORTH_MESSAGES_BY_INTERVAL_TABLE = "north_messages_by_interval";
         String NORTH_MESSAGES_BY_USER_INTERVAL_TABLE = "north_messages_by_user_and_interval";
         String NORTH_MESSAGES_BY_USER_SUBJECT_INTERVAL_TABLE = "north_messages_by_user_subject_and_interval";
+        String SOUTH_MESSAGES_BY_INTERVAL_TABLE = "south_messages_by_interval";
+        String SOUTH_MESSAGES_BY_SUBJECT_INTERVAL_TABLE = "south_messages_by_subject_and_interval";
+        String SOUTH_MESSAGES_BY_SUBJECT_USER_INTERVAL_TABLE = "south_messages_by_subject_user_and_interval";
+        String ALARM_MESSAGES_BY_INTERVAL_TABLE = "alarm_messages_by_interval";
+        String ALARM_MESSAGES_BY_SUBJECT_INTERVAL_TABLE = "alarm_messages_by_subject_and_interval";
+        String ALARM_MESSAGES_BY_SUBJECT_USER_INTERVAL_TABLE = "alarm_messages_by_subject_user_and_interval";
 
         String INTERVAL_FIELD = "interval";
         String ID_FIELD = "id";
@@ -79,7 +85,7 @@ public abstract class AuditMessageEntity implements BucketEntity {
 
     private Date occurTime;
 
-    @PartitionKey(0)
+    @PartitionKey()
     @Column(name = INTERVAL_FIELD)
     @Override
     public long getInterval() {

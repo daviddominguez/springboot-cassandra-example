@@ -4,13 +4,11 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.mapping.MappingManager;
 import es.amplia.cassandra.TestSpringBootCassandraApplication;
-import es.amplia.cassandra.accessor.NorthMessagesByIntervalAccessor;
-import es.amplia.cassandra.accessor.NorthMessagesByUserIntervalAccessor;
-import es.amplia.cassandra.accessor.NorthMessagesByUserSubjectIntervalAccessor;
-import es.amplia.cassandra.repository.NorthMessagesByIntervalRepository;
-import es.amplia.cassandra.repository.NorthMessagesByUserIntervalRepository;
-import es.amplia.cassandra.repository.NorthMessagesByUserSubjectIntervalRepository;
+import es.amplia.cassandra.repository.*;
+import es.amplia.cassandra.service.AlarmMessagesService;
 import es.amplia.cassandra.service.NorthMessagesService;
+import es.amplia.cassandra.service.PayloadService;
+import es.amplia.cassandra.service.SouthMessagesService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +42,37 @@ public class CassandraConfigurationIntegrationTest {
     private NorthMessagesByUserSubjectIntervalRepository northMessagesByUserSubjectIntervalRepository;
 
     @Autowired
+    private SouthMessagesByIntervalRepository southMessagesByIntervalRepository;
+
+    @Autowired
+    private SouthMessagesBySubjectIntervalRepository southMessagesBySubjectIntervalRepository;
+
+    @Autowired
+    private SouthMessagesBySubjectUserIntervalRepository southMessagesBySubjectUserIntervalRepository;
+
+    @Autowired
+    private AlarmMessagesByIntervalRepository alarmMessagesByIntervalRepository;
+
+    @Autowired
+    private AlarmMessagesBySubjectIntervalRepository alarmMessagesBySubjectIntervalRepository;
+
+    @Autowired
+    private AlarmMessagesBySubjectUserIntervalRepository alarmMessagesBySubjectUserIntervalRepository;
+
+    @Autowired
+    private PayloadRepository payloadRepository;
+
+    @Autowired
     private NorthMessagesService northMessagesService;
 
+    @Autowired
+    private SouthMessagesService southMessagesService;
+
+    @Autowired
+    private AlarmMessagesService alarmMessagesService;
+
+    @Autowired
+    private PayloadService payloadService;
 
     @Test
     public void when_application_loads_then_verify_all_services_are_well_injected() {
@@ -58,6 +85,16 @@ public class CassandraConfigurationIntegrationTest {
         assertThat(northMessagesByIntervalRepository, notNullValue());
         assertThat(northMessagesByUserIntervalRepository, notNullValue());
         assertThat(northMessagesByUserSubjectIntervalRepository, notNullValue());
+        assertThat(southMessagesByIntervalRepository, notNullValue());
+        assertThat(southMessagesBySubjectIntervalRepository, notNullValue());
+        assertThat(southMessagesBySubjectUserIntervalRepository, notNullValue());
+        assertThat(alarmMessagesByIntervalRepository, notNullValue());
+        assertThat(alarmMessagesBySubjectIntervalRepository, notNullValue());
+        assertThat(alarmMessagesBySubjectUserIntervalRepository, notNullValue());
+        assertThat(payloadRepository, notNullValue());
         assertThat(northMessagesService, notNullValue());
+        assertThat(southMessagesService, notNullValue());
+        assertThat(alarmMessagesService, notNullValue());
+        assertThat(payloadService, notNullValue());
     }
 }

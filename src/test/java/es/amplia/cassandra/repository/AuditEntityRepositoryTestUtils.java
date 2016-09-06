@@ -17,8 +17,7 @@ class AuditEntityRepositoryTestUtils {
         return (BoundStatement) repository.saveQuery(auditMessageEntity);
     }
 
-    static AuditMessageEntity given_a_persisted_message (AuditMessageEntity auditMessageEntityToSave, Session session, BucketRepository repository)
-            throws ParseException {
+    static AuditMessageEntity given_a_persisted_message (AuditMessageEntity auditMessageEntityToSave, Session session, BucketRepository repository) {
         BoundStatement statement = when_saved_into_repository(repository, auditMessageEntityToSave);
         auditMessageEntityToSave.setId(statement.getUUID(ID_FIELD));
         auditMessageEntityToSave.setInterval(statement.getLong(INTERVAL_FIELD));

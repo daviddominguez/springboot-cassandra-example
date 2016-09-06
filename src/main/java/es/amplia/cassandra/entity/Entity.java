@@ -5,7 +5,7 @@ import java.util.UUID;
 public interface Entity {
 
     interface Names {
-        public final static String KEYSPACE = "audit";
+        String KEYSPACE = "audit";
     }
 
     UUID getId();

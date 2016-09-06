@@ -35,6 +35,12 @@ public class CassandraConfiguration implements DisposableBean {
     }
 
     @Bean
+    @BucketType(DAY)
+    public Bucket dayBucket() {
+        return new DayBucket();
+    }
+
+    @Bean
     @BucketType(WEEK)
     public Bucket weekBucket() {
         return new WeekBucket();

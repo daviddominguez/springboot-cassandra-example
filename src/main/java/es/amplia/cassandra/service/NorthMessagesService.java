@@ -1,10 +1,12 @@
 package es.amplia.cassandra.service;
 
-import es.amplia.cassandra.entity.*;
+import es.amplia.cassandra.entity.NorthMessageByInterval;
+import es.amplia.cassandra.entity.NorthMessageByUserInterval;
+import es.amplia.cassandra.entity.NorthMessageByUserSubjectInterval;
+import es.amplia.cassandra.entity.Page;
 import es.amplia.model.AuditMessage;
 
 import java.util.Date;
-import java.util.UUID;
 
 public interface NorthMessagesService {
 
@@ -17,5 +19,4 @@ public interface NorthMessagesService {
                                                                              Date from, Date to, String pagingState);
     Page<NorthMessageByUserSubjectInterval> getMessagesByUserSubjectInterval(String user, String subject, Date from,
                                                                              Date to, String pagingState, int pageSize);
-    Payload getMessagePayload(UUID id);
 }

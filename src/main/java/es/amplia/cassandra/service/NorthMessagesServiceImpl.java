@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.UUID;
 
 @Service
 class NorthMessagesServiceImpl implements NorthMessagesService {
@@ -97,10 +96,5 @@ class NorthMessagesServiceImpl implements NorthMessagesService {
                                                                                     String pagingState, int fetchSize) {
         return northMessagesByUserSubjectIntervalRepository.getMessagesByUserSubjectInterval(user, subject, from, to,
                 pagingState, fetchSize);
-    }
-
-    @Override
-    public Payload getMessagePayload(UUID id) {
-        return payloadRepository.get(id);
     }
 }

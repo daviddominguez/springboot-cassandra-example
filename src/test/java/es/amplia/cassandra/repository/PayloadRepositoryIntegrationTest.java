@@ -51,7 +51,7 @@ public class PayloadRepositoryIntegrationTest {
         verify_both_messages_are_equal(queried, persisted);
     }
 
-    private Payload given_a_persisted_message(Payload payload) throws ParseException {
+    private Payload given_a_persisted_message(Payload payload) {
         BoundStatement statement = when_saved_into_repository(payload);
         payload.setId(statement.getUUID(ID_FIELD));
         session.execute(statement);
@@ -72,7 +72,7 @@ public class PayloadRepositoryIntegrationTest {
         return (BoundStatement) repository.saveQuery(payload);
     }
 
-    private Payload given_a_payload() throws ParseException {
+    private Payload given_a_payload() {
         return builder().build(AuditMessageBuilder.builder()
                         .msgPayload(asList("payload_value_1", "payload_value_2"))
                         .build());
